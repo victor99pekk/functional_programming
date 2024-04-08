@@ -2,21 +2,29 @@
 substitution _ "" _ = ""
 substitution wildcard (x:xs) replaces 
     | x == wildcard = replaces ++ (substitution wildcard xs replaces)
-    | otherwise     = x ++ (substitution wildcard xs replaces)
+    | otherwise     = [x] ++ (substitution wildcard xs replaces)
 
+-- match :: Eq a => a -> [a] -> [a] -> Maybe [a]
+match _ [] _ = Just []  -- Base case: if pattern is exhausted, return empty list
+match _ _ [] = Nothing -- Base case: if input string is exhausted but pattern remains, return Nothing
 
-match :: Eq a => a -> [a] -> [a] -> Maybe [a]
-match _ [] [] = Just []
-match _ _ []  = Nothing
-match _ [] _  = Nothing
 match wildcard (p:ps) (s:ss)
-    | p == wildcard = matchWildcard ps (s:ss)
-    | p == s        = match wildcard ps ss >>= \r -> Just (s:r)
-    | otherwise     = Nothing
+    | s == p = match wildcard ps ss
+    | wildcard == p = string_builder wildcard (p:ps) (s:ss) [p]
+    | otherwise = Nothing
 
--- Helper function to match wildcard in the pattern
-matchWildcard :: Eq a => [a] -> [a] -> Maybe [a]
-matchWildcard _ [] = Nothing
-matchWildcard pattern@(p:ps) s@(x:xs)
-    | match p pattern s /= Nothing = Just s
-    | otherwise                    = matchWildcard pattern xs
+-- string_builder :: Eq a => a -> [a] -> [a] -> [a] -> Maybe [a]
+string_builder _ [] s string = Just (string ++ s) -- Base case: if pattern is exhausted, return the accumulated string
+string_builder _ p [] string = Just (string ++ p)
+
+string_builder wildcard (p:ps) (s:ss) string
+    | p == s = iterator wildcard ps ss string -- Add character to string if they match
+    | otherwise = string_builder wildcard ps ss (string ++ [s]) -- Replace wildcard in string
+
+-- iterator :: Eq a => a -> [a] -> [a] -> [a] -> Maybe [a]
+iterator _ [] _ string = Just string  -- Base case: if pattern is exhausted, return the accumulated string
+-- iterator _ [] s string = Just (string ++ s) -- Base case: if pattern is exhausted, return the accumulated string
+iterator _ p [] string = Just (string ++ p)
+iterator wildcard (p:ps) (s:ss) string
+    | p == s || p == wildcard = iterator wildcard ps ss string -- Skip character if it's the same as pattern or wildcard
+    | otherwise = Nothing
