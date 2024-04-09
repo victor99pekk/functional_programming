@@ -11,7 +11,7 @@ match _ _ [] = Nothing -- Base case: if input string is exhausted but pattern re
 
 match wildcard (p:ps) (s:ss)
     | s == p = match wildcard ps ss
-    | wildcard == p = string_builder wildcard (p:ps) (s:ss) [p]
+    | wildcard == p = string_builder wildcard (p:ps) (s:ss) ""
     | otherwise = Nothing
 
 -- string_builder :: Eq a => a -> [a] -> [a] -> [a] -> Maybe [a]
@@ -42,11 +42,13 @@ iterator wildcard (p:ps) (s:ss) string
 --     where 
 --         matched = match wildcard (fst tuples) string
 
+french = ("My name is *", "Je m'appelle *")
+myname = "My name is Zacharias"
 -- transformationApply :: Char -> (Char -> [a1] -> [a2] -> Maybe a3) -> [a2] -> ([a1], [Char]) -> Maybe [Char]
 transformationApply _ _ [] _ = Nothing  -- If the input list is empty, no match is possible
 transformationApply _ _ _ ([], _) = Nothing  -- If the first pattern in the pair is empty, no match is possible
 
-transformationApply wildcard match string tuples
+transformationApply wildcard func string tuples
     | Just matchedList <- matched = Just (substitution wildcard (snd tuples) matchedList)  -- Handle Just case
     | otherwise = Nothing  -- Handle Nothing case
     where 
@@ -74,4 +76,3 @@ reflections =
 -- reflect word = [y | (x,y) <- reflections, x == word]
 reflect word = fmap snd . listToMaybe . filter (\(x, _) -> x == word) $ reflections
 
-rulesApply :: [PhrasePair] -> Phrase -> Phrase
