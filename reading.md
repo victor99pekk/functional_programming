@@ -515,4 +515,26 @@ instace Monad Maybe where
   return v = Just v
 ```
 
+# Case-statements
+
+example:
+```haskell
+let grade = 'A'
+
+if grade == 'A'
+  then putStrLn "good"
+else if grade == 'B'
+  then putStrLn "pretty good"
+else if grade == 'C'
+  then putStrLn "okey"
+```
+improvement is case-statements
+
+```haskell
+case grade of
+  'A' -> putStrLn "good"
+  'B' -> putStrln "pretty good"
+  'C' -> putStrLn "okey"
+  _   -> "fail"
+```
 
