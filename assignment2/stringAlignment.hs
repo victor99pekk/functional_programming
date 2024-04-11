@@ -1,0 +1,50 @@
+-- Input: Two strings s and t, and values for scoreMatch, scoreMismatch, and scoreSpace.
+-- Output: All optimal alignments between s and t.
+
+-- optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
+
+score :: Char -> Char -> Int
+score '-' _ = -3
+score _ '-' = -3
+score x y
+    | x == y = 1
+    | otherwise = -2
+
+-- 2a)
+similarityScore :: String -> String -> Int
+similarityScore [] [] = 0
+similarityScore [] (y:ys) = score '-' y + similarityScore [] ys
+similarityScore (x:xs) [] = score x '-' + similarityScore xs []
+similarityScore (x:xs) (y:ys) = max
+        (similarityScore xs ys + score x y)
+        (max
+            (similarityScore xs (y:ys) + score x '-')
+            (similarityScore (x:xs) ys + score '-' y)
+        )
+
+-- 2b) attachHeads takes two elements h1 and h2, and attaches them to the heads of the lists in aList.
+-- aList is a list that contains two lists in each index, h1 gets added as the head of the first list
+-- in each index, and h2 gets added as the head of the second list in each index.
+-- attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
+-- attachHeads h1 h2 aList = [(h1:xs,h2:ys) | (xs,ys) <- aList]
+
+-- 2c)
+maximaBy :: Ord b => (a -> b) -> [a] -> [a]
+maximaBy valueFcn xs = [x | x <- xs, valueFcn x == maximum (map valueFcn xs)]
+type AlignmentType = (String,String)
+
+-- 2d)
+optAlignments :: String -> String -> [AlignmentType]
+optAlignments x y = maximaBy scorefunction (createLists x y)
+
+createLists :: String -> String -> [AlignmentType]
+createLists [] [] = []
+createLists [] (y:ys) = ((attachHeads '-' y) : createLists [] ys)
+createLists (x:xs) [] = ((attachHeads x '-') : createLists xs [])
+createLists (x:xs) (y:ys) = [((attachHeads x '-') : createLists xs y:ys), ((attachHeads x y) : createLists xs ys),
+                            ((attachHeads '-' y) : createLists x:xs ys)]
+
+scorefunction :: [[AlignmentType]] -> Int
+scorefunction aList = foldr (\ (x,y) -> score x y) 0 aList
+
+-- outputOptAlignments string1 string2
