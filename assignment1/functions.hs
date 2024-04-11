@@ -73,6 +73,46 @@ reflections =
     ("you",    "me")
   ]
 
+phrase_pairs :: [PhrasePair]
+phrase_pairs =
+  [ (["am"],     ["are"]),
+    (["was"],    ["were"]),
+    (["i"],      ["you"]),
+    (["i'm"],    ["you", "are"]),
+    (["i'd"],    ["you", "would"]),
+    (["i've"],   ["you", "have"]),
+    (["i'll"],   ["you", "will"]),
+    (["my"],     ["your"]),
+    (["me"],     ["you"]),
+    (["are"],    ["am"]),
+    (["you're"], ["i", "am"]),
+    (["you've"], ["i", "have"]),
+    (["you'll"], ["i", "will"]),
+    (["your"],   ["my"]),
+    (["yours"],  ["mine"]),
+    (["you"],    ["me"])
+  ]
+
+
+type Phrase = [String]
+type PhrasePair = (Phrase, Phrase)
+type BotBrain = [(Phrase, [Phrase])]
+
 -- reflect word = [y | (x,y) <- reflections, x == word]
 reflect word = fmap snd . listToMaybe . filter (\(x, _) -> x == word) $ reflections
+
+reflect word = fmap (\x -> if transformationApply '*' id x reflections == Nothing then x else transformationApply '*' id x reflections) word
+
+words   :: String -> [String]
+unwords :: [String] -> String
+
+-- rulesApply :: [PhrasePair] -> Phrase -> Phrase
+
+-- rulesApply [] _ = []  -- If the input list is empty, no match is possible
+-- rulesApply _ [] = []  -- If the input phrase is empty, no match is possible
+
+-- rulesApply ((pattern, replacement):pairs) phrase =
+--     case transformationApply '*' id (unwords phrase) (unwords pattern, unwords replacement) of
+--         Nothing -> rulesApply pairs phrase
+--         Just res -> [res]
 
