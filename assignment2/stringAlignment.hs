@@ -80,67 +80,24 @@ stringBuilder ((x:xs),(y:ys)) =  [x] ++ stringBuilder (xs, "") ++ "\n" ++ [y] ++
 
 -- 3. Optimize the computing in exercise 2 through memoization
 
-mcsLength :: Eq a => [a] -> [a] -> Int
-mcsLength xs ys = mcsLen (length xs) (length ys)
+newSimilarityScore :: Eq a => [a] -> [a] -> Int
+newSimilarityScore xs ys = mcsLen (length xs) (length ys)
   where
     mcsLen i j = mcsTable!!i!!j
     mcsTable = [[ mcsEntry i j | j<-[0..]] | i<-[0..] ]
        
     mcsEntry :: Int -> Int -> Int
-    mcsEntry _ 0 = 0
-    mcsEntry 0 _ = 0
+    mcsEntry 0 j = j * scoreSpace
+    mcsEntry i 0 = i * scoreSpace
     mcsEntry i j
-      | x == y    = 1 + mcsLen (i-1) (j-1)
-      | otherwise = max (mcsLen i (j-1)) 
-                        (mcsLen (i-1) j)
-      where
-         x = xs!!(i-1)
-         y = ys!!(j-1)
+        | x == y = max (diag + scoreMatch) (max left up)
+        |otherwise = max  (diag + scoreMismatch)
+                        ((max (mcsLen i (j-1)) (mcsLen (i-1) (j))) + scoreSpace)
 
-
-newSimilarityScore :: String -> String -> (Int)
-newSimilarityScore [] _ = 0
-newSimilarityScore _ [] = 0
-
-newSimilarityScore string1 string2 = result
-    where
-        col = length string1
-        row = length string2
-        table = [ [newScore i j | i <- [0..row-1]] | j <- [0..col-1] ]
-        result = iterateTable table !! (row - 1) !! (col - 1)
-
-        newScore row col
-            | (row == 0 || col == 0) = 0
-            | otherwise = maximum [ table !!(row-1) !!(col-1) + gridScore row col,
-                                    table !!(row) !!(col-1) + scoreSpace,
-                                    table !!(row-1) !!(col) + scoreSpace]
-
-        gridScore row col
-            | string1 !!col == string2 !!row = scoreMatch
-            | otherwise = scoreMismatch
-
-iterateTable :: [[Int]] -> [[Int]]
-iterateTable table = iterate' table
-    where
-        iterate' t = let next = newIteration t
-                     in if next == t then t else iterate' next
-
-        newIteration t = [ [newScore i j | i <- [0..col-1]] | j <- [0..row-1]]
-            where
-                col = length (head t)
-                row = length t
-                newScore r c
-                    | (r == 0 || c == 0) = 0
-                    | otherwise = maximum [ getScore (r-1) (c-1) + gridScore r c
-                                          , getScore r (c-1) + scoreSpace
-                                          , getScore (r-1) c + scoreSpace]
-
-                getScore r c
-                    | r < 0 || c < 0 = 0
-                    | otherwise = t !! r !! c
-
-                gridScore r c
-                    | string1 !! c == string2 !! r = scoreMatch
-                    | otherwise = scoreMismatch
-
+        where
+            x = xs!!(i-1)
+            y = ys!!(j-1)
+            up = mcsLen (i-1) j + scoreSpace
+            left = mcsLen i (j-1) + scoreSpace
+            diag = mcsLen (i-1) (j-1)
 
