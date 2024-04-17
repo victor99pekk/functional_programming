@@ -58,6 +58,9 @@ createLists (x:xs) (y:ys) =
            , attachHeads x '-' (createLists xs (y:ys))
            ]
 
+
+
+
 -- scorefunction :: AlignmentType -> Int
 -- scorefunction aList = foldr (\ (x,y) acc -> (score x y) + acc) 0 aList
 
@@ -100,51 +103,30 @@ newSimilarityScore xs ys = mcsLen (length xs) (length ys)
             up = mcsLen (i-1) j + scoreSpace
             left = mcsLen i (j-1) + scoreSpace
             diag = mcsLen (i-1) (j-1)
-
-
--- newOptAlignments :: Eq a => [a] -> [a] -> (Int, [AlignmentType])
--- newOptAlignments xs ys = mcsLen (length xs) (length ys)
---   where
---     mcsLen i j = mcsTable!!i!!j
---     mcsTable = [[ mcsEntry i j | j<-[0..]] | i<-[0..] ]
-       
---     mcsEntry :: Int -> Int -> (Int, [AlignmentType])
---     mcsEntry 0 j = j * scoreSpace
---     mcsEntry i 0 = i * scoreSpace
---     mcsEntry i j
---         | x == y = max (diag + scoreMatch) (max left up)
---         |otherwise = maxValue
-
---         where
---             maxValue = max (diag + hit) (max left up)
---             x = xs!!(i-1)
---             y = ys!!(j-1)
---             up = mcsLen (i-1) j + scoreSpace
---             left = mcsLen i (j-1) + scoreSpace
---             diag = mcsLen (i-1) (j-1)
---             hit
---                 | x == y = scoreMatch
---                 |otherwise = scoreMismatch
 newOptAlignments :: String -> String -> (Int, [AlignmentType])
-newOptAlignments xs ys = mcsLen (length xs) (length ys)
+newOptAlignments string1 string2 = (length (snd optimalAlignments), (snd optimalAlignments))
   where
     mcsLen i j = mcsTable !! i !! j
-    mcsTable = [[mcsEntry i j | j <- [0 ..]] | i <- [0 ..]]
+    mcsTable = [[mcsEntry i j | j <- [0 .. length string2]] | i <- [0 .. length string1]]
 
     mcsEntry :: Int -> Int -> (Int, [AlignmentType])
-    mcsEntry 0 0 = (0, [([], [])])
-    mcsEntry 0 j = (j * scoreSpace, [([], replicate j '-')])
-    mcsEntry i 0 = (i * scoreSpace, [(replicate i '-', [])])
-    mcsEntry i j
-      | x == y = (maxScore, alignmentsWithMatch)
-      | otherwise = (maxScore, alignmentsWithMismatch)
+    mcsEntry 0 0 = (0, [("", "")])
+    mcsEntry 0 j = (j * scoreSpace, [("", replicate j '-')])
+    mcsEntry i 0 = (i * scoreSpace, [(replicate i '-', "")])
+    mcsEntry i j = alignments
       where
-        x = xs !! (i - 1)
-        y = ys !! (j - 1)
+        x = string1 !! (i - 1)
+        y = string2 !! (j - 1)
         upScore = fst (mcsLen (i - 1) j) + scoreSpace
         leftScore = fst (mcsLen i (j - 1)) + scoreSpace
-        diagScore = fst (mcsLen (i - 1) (j - 1))
-        maxScore = maximum [diagScore + if x == y then scoreMatch else scoreMismatch, upScore, leftScore]
-        alignmentsWithMatch = [(a ++ [x], b ++ [y]) | (a, b) <- snd (mcsLen (i - 1) (j - 1)), x == y]
-        alignmentsWithMismatch = concatMap (\(score, aligns) -> [(a ++ [x], b ++ [y]) | (a, b) <- aligns]) $
-          filter (\(score, _) -> score == maxScore) [(diagScore + if x == y then scoreMatch else scoreMismatch, snd (mcsLen (i - 1) (j - 1))), (upScore, snd (mcsLen (i - 1) j)), (leftScore, snd (mcsLen i (j - 1)))]
+        diagScore = if x == y then fst (mcsLen (i - 1) (j - 1)) + scoreMatch else fst (mcsLen (i - 1) (j - 1)) + scoreMismatch
+        maxScore = maximum [diagScore, upScore, leftScore]
+
+        matchAlignments = [(a ++ [x], b ++ [y]) | (a, b) <- snd (mcsLen (i - 1) (j - 1)), diagScore == maxScore]
+        mismatchAlignments1 = [(a ++ [x], b ++ "-") | (a, b) <- snd (mcsLen (i - 1) j), upScore == maxScore]
+        mismatchAlignments2 = [(a ++ "-", b ++ [y]) | (a, b) <- snd (mcsLen i (j - 1)), leftScore == maxScore]
+        mismatchAlignments = mismatchAlignments1 ++ mismatchAlignments2
+
+        alignments = (maxScore, mismatchAlignments ++ matchAlignments)
+
+    optimalAlignments = mcsLen (length string1) (length string2)
