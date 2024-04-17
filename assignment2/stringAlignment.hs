@@ -12,12 +12,16 @@ scoreSpace = -1
 string1 = "writers"
 string2 = "vintner"
 
+
+
 score :: Char -> Char -> Int
 score '-' _ = scoreMismatch
 score _ '-' = scoreSpace
 score x y
     | x == y = scoreMatch
     | otherwise = scoreMismatch
+
+
 
 -- 2a)
 similarityScore :: String -> String -> Int
@@ -31,11 +35,15 @@ similarityScore (x:xs) (y:ys) = max
             (similarityScore (x:xs) ys + score '-' y)
         )
 
+
+
 -- 2b) attachHeads takes two elements h1 and h2, and attaches them to the heads of the lists in aList.
 -- aList is a list that contains two lists in each index, h1 gets added as the head of the first list
 -- in each index, and h2 gets added as the head of the second list in each index.
 attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
 attachHeads h1 h2 aList = [(h1:xs,h2:ys) | (xs,ys) <- aList]
+
+
 
 -- 2c)
 maximaBy :: Ord b => (a -> b) -> [a] -> [a]
@@ -43,6 +51,8 @@ maximaBy valueFcn xs = filter ((== maximumValue) . valueFcn) xs
   where
     maximumValue = maximum (map valueFcn xs)
 type AlignmentType = (String,String)
+
+
 
 -- 2d)
 optAlignments :: String -> String -> [AlignmentType]
@@ -59,15 +69,9 @@ createLists (x:xs) (y:ys) =
            ]
 
 
-
-
--- scorefunction :: AlignmentType -> Int
--- scorefunction aList = foldr (\ (x,y) acc -> (score x y) + acc) 0 aList
-
 scorefunction :: AlignmentType -> Int
 scorefunction ("", "") = 0
 scorefunction ((x:xs), (y:ys)) = (score x y) + scorefunction (xs, ys)
-
 
 outputOptAlignments :: String -> String -> IO ()
 outputOptAlignments x y = do
@@ -81,8 +85,8 @@ stringBuilder ((x:xs), "") = [x] ++ stringBuilder (xs, "")
 stringBuilder ((x:xs),(y:ys)) =  [x] ++ stringBuilder (xs, "") ++ "\n" ++ [y] ++ stringBuilder ("", ys) ++ "\n\n"
 
 
--- 3. Optimize the computing in exercise 2 through memoization
 
+-- 3. Optimization of function from exercise 2, through memoization
 newSimilarityScore :: Eq a => [a] -> [a] -> Int
 newSimilarityScore xs ys = mcsLen (length xs) (length ys)
   where
@@ -103,6 +107,8 @@ newSimilarityScore xs ys = mcsLen (length xs) (length ys)
             up = mcsLen (i-1) j + scoreSpace
             left = mcsLen i (j-1) + scoreSpace
             diag = mcsLen (i-1) (j-1)
+
+
 newOptAlignments :: String -> String -> (Int, [AlignmentType])
 newOptAlignments string1 string2 = (length (snd optimalAlignments), (snd optimalAlignments))
   where
