@@ -112,29 +112,39 @@ substitute wildcard (x:xs) replaces
 
 -- Tries to match two lists. If they match, the result consists of the sublist
 -- bound to the wildcard in the pattern list.
+-- match :: Eq a => a -> [a] -> [a] -> Maybe [a]
+-- match _ [] [] = Just []
+-- match _ [] _ = Just []  
+-- match _ _ [] = Nothing 
+
+-- match wildcard (p:ps) (s:ss)
+--     | s /= p && wildcard /= p = Nothing
+--     | s == p = match wildcard ps ss
+--     | wildcard == p = 
+--       case singleWildcardMatch ps ss of
+--         Just res -> Just res
+--         Nothing -> longerWildcardMatch (p:ps) (s:ss)
+--     where
+--       singleWildcardMatch (p:ps) (s:ss) = Just (s : match wildcard ps ss)
+--       longerWildcardMatch (p:ps) (s:ss) = Just (s : match wildcard (p:ps) ss)
+
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ [] [] = Just []
-match _ [] _ = Just []  -- Base case: if pattern is exhausted, return empty list
-match _ _ [] = Nothing -- Base case: if input string is exhausted but pattern remains, return Nothing
+match _ [] _ = Just []  
+match _ _ [] = Nothing 
 
 match wildcard (p:ps) (s:ss)
     | s /= p && wildcard /= p = Nothing
     | s == p = match wildcard ps ss
     | wildcard == p = 
-      case singleWildcardMatch (p:ps) (s:ss) of
-        Just _ -> singleWildcardMatch (p:ps) (s:ss)
+      case singleWildcardMatch ps ss of
+        Just res -> Just ([s])
         Nothing -> longerWildcardMatch (p:ps) (s:ss)
-    where 
-      -- singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
-      singleWildcardMatch (_:ps) (x:xs) = 
-        case match wildcard ps xs of
-          Just _  -> Just [x]
-          Nothing -> Nothing
+    where
+      singleWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard ps ss)
+      longerWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard (p:ps) ss)
 
-      longerWildcardMatch (wc:ps) (x:xs) = 
-        case match wildcard (ps) (xs) of
-          Just res -> Just ([x] : res)
-          Nothing -> Nothing
+
 
 -- Test cases --------------------
 
