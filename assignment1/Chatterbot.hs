@@ -106,14 +106,13 @@ reductionsApply _ = id
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
 substitute _ [] _ = []
-substitute wildcard (x:xs) replaces 
+substitute wildcard (x:xs) replaces
     | x == wildcard = replaces ++ (substitute wildcard xs replaces)
     | otherwise     = [x] ++ (substitute wildcard xs replaces)
 
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ [] [] = Just []
-match _ [] _ = Just []  
-match _ _ [] = Nothing 
+match _ _ [] = Just []
 
 match wildcard (p:ps) (s:ss)
     | s /= p && wildcard /= p = Nothing
@@ -123,11 +122,9 @@ match wildcard (p:ps) (s:ss)
         Just res -> Just ([s])
         Nothing -> longerWildcardMatch (p:ps) (s:ss)
     where
-      singleWildcardMatch [] _ = Just []
+      singleWildcardMatch [] _ = Nothing
       singleWildcardMatch _ [] = Nothing
       singleWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard ps ss)
-      longerWildcardMatch [] _ = Just []
-      longerWildcardMatch _ [] = Nothing
       longerWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard (p:ps) ss)
 
 
@@ -152,8 +149,12 @@ substituteCheck = substituteTest == testString
 
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
-transformationApply _ _ _ _ = Nothing
-{- TO BE WRITTEN -}
+transformationApply _ _ [] _ = Nothing
+transformationApply w function string tuple = 
+  case match w (fst tuple) string of
+        Just matched -> Just (substitute w (snd tuple) matched)
+        Nothing -> Nothing
+
 
 
 -- Applying a list of patterns until one succeeds

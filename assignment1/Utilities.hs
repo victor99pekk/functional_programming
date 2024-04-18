@@ -1,5 +1,8 @@
 module Utilities where
 
+frenchPresentation = ("My name is *", "Je m'appelle *")
+
+
 map2 :: (a -> b, c -> d) -> (a, c) -> (b, d)
 map2 (f1, f2) (x1, x2) = (f1 x1, f2 x2)
 
