@@ -3,6 +3,7 @@ import Utilities
 import System.Random
 import Data.Char
 
+
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
     putStrLn ("\n\nHi! I am " ++ botName ++ ". How are you?")
@@ -34,8 +35,14 @@ rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply _ = id
 
 reflect :: Phrase -> Phrase
-{- TO BE WRITTEN -}
-reflect = id
+reflect [] = []
+reflect (word:words) = (reflect_help (word) reflections) : (reflect words)
+
+reflect_help :: String -> [(String, String)] -> String
+reflect_help word [] = word
+reflect_help word (tuple:tuples) 
+  | word == (fst tuple) = snd tuple
+  | otherwise = reflect_help word tuples
 
 reflections =
   [ ("am",     "are"),
@@ -155,11 +162,12 @@ transformationApply w function string tuple =
         Just matched -> Just (substitute w (snd tuple) matched)
         Nothing -> Nothing
 
-
-
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-transformationsApply _ _ _ _ = Nothing
-{- TO BE WRITTEN -}
+transformationsApply _ _ [] _ = Nothing
+transformationsApply w function (tuple:tuples) string = 
+  case transformationApply w function string tuple of 
+    Just matched -> Just matched
+    Nothing -> transformationsApply w function tuples string
 
 
