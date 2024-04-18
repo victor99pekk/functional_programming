@@ -44,6 +44,7 @@ iterator wildcard (p:ps) (s:ss) string
 
 french = ("My name is *", "Je m'appelle *")
 myname = "My name is Zacharias"
+transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 -- transformationApply :: Char -> (Char -> [a1] -> [a2] -> Maybe a3) -> [a2] -> ([a1], [Char]) -> Maybe [Char]
 transformationApply _ _ [] _ = Nothing  -- If the input list is empty, no match is possible
 transformationApply _ _ _ ([], _) = Nothing  -- If the first pattern in the pair is empty, no match is possible
@@ -73,7 +74,7 @@ reflections =
     ("you",    "me")
   ]
 
-phrase_pairs :: [PhrasePair]
+-- phrase_pairs :: [PhrasePair]
 phrase_pairs =
   [ (["am"],     ["are"]),
     (["was"],    ["were"]),
@@ -94,17 +95,17 @@ phrase_pairs =
   ]
 
 
-type Phrase = [String]
-type PhrasePair = (Phrase, Phrase)
-type BotBrain = [(Phrase, [Phrase])]
+-- type Phrase = [String]
+-- type PhrasePair = (Phrase, Phrase)
+-- type BotBrain = [(Phrase, [Phrase])]
 
--- reflect word = [y | (x,y) <- reflections, x == word]
-reflect word = fmap snd . listToMaybe . filter (\(x, _) -> x == word) $ reflections
+-- -- reflect word = [y | (x,y) <- reflections, x == word]
+-- reflect word = fmap snd . listToMaybe . filter (\(x, _) -> x == word) $ reflections
 
-reflect word = fmap (\x -> if transformationApply '*' id x reflections == Nothing then x else transformationApply '*' id x reflections) word
+-- reflect word = fmap (\x -> if transformationApply '*' id x reflections == Nothing then x else transformationApply '*' id x reflections) word
 
-words   :: String -> [String]
-unwords :: [String] -> String
+-- words   :: String -> [String]
+-- unwords :: [String] -> String
 
 -- rulesApply :: [PhrasePair] -> Phrase -> Phrase
 

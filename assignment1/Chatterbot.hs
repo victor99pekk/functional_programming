@@ -110,24 +110,6 @@ substitute wildcard (x:xs) replaces
     | x == wildcard = replaces ++ (substitute wildcard xs replaces)
     | otherwise     = [x] ++ (substitute wildcard xs replaces)
 
--- Tries to match two lists. If they match, the result consists of the sublist
--- bound to the wildcard in the pattern list.
--- match :: Eq a => a -> [a] -> [a] -> Maybe [a]
--- match _ [] [] = Just []
--- match _ [] _ = Just []  
--- match _ _ [] = Nothing 
-
--- match wildcard (p:ps) (s:ss)
---     | s /= p && wildcard /= p = Nothing
---     | s == p = match wildcard ps ss
---     | wildcard == p = 
---       case singleWildcardMatch ps ss of
---         Just res -> Just res
---         Nothing -> longerWildcardMatch (p:ps) (s:ss)
---     where
---       singleWildcardMatch (p:ps) (s:ss) = Just (s : match wildcard ps ss)
---       longerWildcardMatch (p:ps) (s:ss) = Just (s : match wildcard (p:ps) ss)
-
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ [] [] = Just []
 match _ [] _ = Just []  
@@ -141,7 +123,11 @@ match wildcard (p:ps) (s:ss)
         Just res -> Just ([s])
         Nothing -> longerWildcardMatch (p:ps) (s:ss)
     where
+      singleWildcardMatch [] _ = Just []
+      singleWildcardMatch _ [] = Nothing
       singleWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard ps ss)
+      longerWildcardMatch [] _ = Just []
+      longerWildcardMatch _ [] = Nothing
       longerWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard (p:ps) ss)
 
 
