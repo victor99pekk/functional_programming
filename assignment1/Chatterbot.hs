@@ -27,12 +27,13 @@ type BotBrain = [(Phrase, [Phrase])]
 --------------------------------------------------------
 
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
-{- TO BE WRITTEN -}
-stateOfMind _ = return id
+stateOfMind brain = do
+    index <- randomRIO (0, length brain - 1)
+    let (pattern, responses) = brain !! index
+    return $ \phrase -> rulesApply [(pattern, map unwords responses)] (phrase)
 
-rulesApply :: [PhrasePair] -> Phrase -> Phrase
-{- TO BE WRITTEN -}
-rulesApply _ = id
+
+
 
 reflect :: Phrase -> Phrase
 reflect [] = []
@@ -76,8 +77,9 @@ prepare :: String -> Phrase
 prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|") 
 
 rulesCompile :: [(String, [String])] -> BotBrain
-{- TO BE WRITTEN -}
-rulesCompile _ = []
+rulesCompile = map (\(pattern, responses) -> (prepare pattern, map prepare responses))
+  where
+    prepare = words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 
 --------------------------------------
@@ -119,7 +121,8 @@ substitute wildcard (x:xs) replaces
 
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ [] [] = Just []
-match _ _ [] = Just []
+match _ _ [] = Nothing
+match _ [] _ = Nothing
 
 match wildcard (p:ps) (s:ss)
     | s /= p && wildcard /= p = Nothing
@@ -132,6 +135,8 @@ match wildcard (p:ps) (s:ss)
       singleWildcardMatch [] _ = Nothing
       singleWildcardMatch _ [] = Nothing
       singleWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard ps ss)
+
+      -- longerWildcardMatch [] _ = Nothing
       longerWildcardMatch (p:ps) (s:ss) = fmap (s :) (match wildcard (p:ps) ss)
 
 
@@ -166,8 +171,11 @@ transformationApply w function string tuple =
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
 transformationsApply _ _ [] _ = Nothing
 transformationsApply w function (tuple:tuples) string = 
-  case transformationApply w function string tuple of 
+  case transformationApply w function string tuple of
     Just matched -> Just matched
     Nothing -> transformationsApply w function tuples string
 
-
+rulesApply transformations phrase =
+  case transformationsApply "*" id transformations phrase of
+    Just transformed -> reflect transformed
+    Nothing -> reflect phrase
