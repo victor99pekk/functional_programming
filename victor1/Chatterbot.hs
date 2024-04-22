@@ -1,13 +1,18 @@
-module Chatterbot where
-import Utilities
-import System.Random
-import Data.Char
+-- Jonathan Do, Victor Mikkelsen
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
+{-# HLINT ignore "Use when" #-}
+module Chatterbot where
+
+import Data.Char
+import Data.Maybe
+import System.Random
+import Utilities
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
-    putStrLn ("\n\nHi! I am " ++ botName ++ ". How are you?")
-    botloop
+  putStrLn ("\n\nHi! I am " ++ botName ++ ". How are you?")
+  botloop
   where
     brain = rulesCompile botRules
     botloop = do
@@ -20,87 +25,82 @@ chatterbot botName botRules = do
 --------------------------------------------------------
 
 type Phrase = [String]
+
 type PhrasePair = (Phrase, Phrase)
+
 type BotBrain = [(Phrase, [Phrase])]
 
-
 --------------------------------------------------------
---t
+
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind botbrain =
   fmap (\r -> rulesApply $ (map . map2) (id, pick r) botbrain) (randomIO :: IO Float)
 
+rulesApply :: [PhrasePair] -> Phrase -> Phrase
+rulesApply tlist phrases = fromMaybe [] (transformationsApply "*" reflect tlist phrases)
+
 reflect :: Phrase -> Phrase
 reflect [] = []
-reflect (word:words) = (reflect_help (word) reflections) : (reflect words)
-
-reflect_help :: String -> [(String, String)] -> String
-reflect_help word [] = word
-reflect_help word (tuple:tuples) 
-  | word == (fst tuple) = snd tuple
-  | otherwise = reflect_help word tuples
+reflect (p:ps) = maybe p id (lookup p reflections) : reflect ps
 
 reflections =
-  [ ("am",     "are"),
-    ("was",    "were"),
-    ("i",      "you"),
-    ("i'm",    "you are"),
-    ("i'd",    "you would"),
-    ("i've",   "you have"),
-    ("i'll",   "you will"),
-    ("my",     "your"),
-    ("me",     "you"),
-    ("are",    "am"),
+  [ ("am", "are"),
+    ("was", "were"),
+    ("i", "you"),
+    ("i'm", "you are"),
+    ("i'd", "you would"),
+    ("i've", "you have"),
+    ("i'll", "you will"),
+    ("my", "your"),
+    ("me", "you"),
+    ("are", "am"),
     ("you're", "i am"),
     ("you've", "i have"),
     ("you'll", "i will"),
-    ("your",   "my"),
-    ("yours",  "mine"),
-    ("you",    "me")
+    ("your", "my"),
+    ("yours", "mine"),
+    ("you", "me")
   ]
-
 
 ---------------------------------------------------------------------------------
 
 endOfDialog :: String -> Bool
-endOfDialog = (=="quit") . map toLower
+endOfDialog = (== "quit") . map toLower
 
 present :: Phrase -> String
 present = unwords
 
 prepare :: String -> Phrase
-prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|") 
+prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
-rulesCompile = map (\(pattern, responses) -> (prepare pattern, map prepare responses))
-  where
-    prepare = words . map toLower . filter (not . flip elem ".,:;*!#%&|")
-
+rulesCompile = map (\(str, strs) -> (words $ map toLower str, map words strs))
 
 --------------------------------------
 
-
 reductions :: [PhrasePair]
-reductions = (map.map2) (words, words)
-  [ ( "please *", "*" ),
-    ( "can you *", "*" ),
-    ( "could you *", "*" ),
-    ( "tell me if you are *", "are you *" ),
-    ( "tell me who * is", "who is *" ),
-    ( "tell me what * is", "what is *" ),
-    ( "do you know who * is", "who is *" ),
-    ( "do you know what * is", "what is *" ),
-    ( "are you very *", "are you *" ),
-    ( "i am very *", "i am *" ),
-    ( "hi *", "hello *")
-  ]
+reductions =
+  (map . map2)
+    (words, words)
+    [ ("please *", "*"),
+      ("can you *", "*"),
+      ("could you *", "*"),
+      ("tell me if you are *", "are you *"),
+      ("tell me who * is", "who is *"),
+      ("tell me what * is", "what is *"),
+      ("do you know who * is", "who is *"),
+      ("do you know what * is", "what is *"),
+      ("are you very *", "are you *"),
+      ("i am very *", "i am *"),
+      ("hi *", "hello *")
+    ]
 
 reduce :: Phrase -> Phrase
 reduce = reductionsApply reductions
 
 reductionsApply :: [PhrasePair] -> Phrase -> Phrase
+{- TO BE WRITTEN -}
 reductionsApply = fix . try . transformationsApply "*" id
-
 
 -------------------------------------------------------
 -- Match and substitute
@@ -109,10 +109,10 @@ reductionsApply = fix . try . transformationsApply "*" id
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
 substitute _ [] _ = []
-substitute wildcard (x:xs) replaces
-    | x == wildcard = replaces ++ (substitute wildcard xs replaces)
-    | otherwise     = [x] ++ (substitute wildcard xs replaces)
+substitute wc (t:ts) s = if t == wc then s ++ substitute wc ts s else t : substitute wc ts s
 
+-- Tries to match two lists. If they match, the result consists of the sublist
+-- bound to the wildcard in the pattern list.
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ [] [] = Just []
 match _ _ [] = Nothing
@@ -134,26 +134,7 @@ match wildcard (p:ps) (s:ss)
       longerWildcardMatch (p:ps) (s:ss) = mmap (s :) (match wildcard (p:ps) ss)
 
 
-
--- Test cases --------------------
-
-testPattern =  "a=*;"
-testSubstitutions = "32"
-testString = "a=32;"
-
-substituteTest = substitute '*' testPattern testSubstitutions
-substituteCheck = substituteTest == testString
-
--- matchTest = match '*' testPattern testString
--- matchCheck = matchTest == Just testSubstitutions
-
-
-
--------------------------------------------------------
--- Applying patterns
---------------------------------------------------------
-
--- Applying a single pattern
+-- | Apply a single pattern to a list of tokens.
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 transformationApply _ _ [] _ = Nothing
 transformationApply w function string tuple = 
@@ -169,7 +150,3 @@ transformationsApply w function (tuple:tuples) string =
     Just matched -> Just matched
     Nothing -> transformationsApply w function tuples string
 
-rulesApply transformations phrase =
-  case transformationsApply "*" reflect transformations phrase of
-    Just transformed -> transformed
-    Nothing -> []
