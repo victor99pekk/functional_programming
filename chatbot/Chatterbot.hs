@@ -1,10 +1,10 @@
 -- Victor Pekkari, Brasse Wiklund
-
 module Chatterbot where
-import Utilities
-import System.Random
-import Data.Char
 
+import Data.Char
+import Data.Maybe
+import System.Random
+import Utilities
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
@@ -25,7 +25,6 @@ type Phrase = [String]
 type PhrasePair = (Phrase, Phrase)
 type BotBrain = [(Phrase, [Phrase])]
 
-
 --------------------------------------------------------
 --t
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
@@ -33,8 +32,7 @@ stateOfMind botbrain =
   fmap (\r -> rulesApply $ (map . map2) (id, pick r) botbrain) (randomIO :: IO Float)
 
 reflect :: Phrase -> Phrase
-reflect [] = []
-reflect (word:words) = (reflect_help (word) reflections) : (reflect words)
+reflect = map $ \word -> fromMaybe word (lookup word reflections)
 
 reflect_help :: String -> [(String, String)] -> String
 reflect_help word [] = word
@@ -61,8 +59,10 @@ reflections =
     ("you",    "me")
   ]
 
+rulesCompile :: [(String, [String])] -> BotBrain
+rulesCompile = map (\(string, strings) -> (words $ map toLower string, map words strings))
 
----------------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------------
 
 endOfDialog :: String -> Bool
 endOfDialog = (=="quit") . map toLower
@@ -73,13 +73,7 @@ present = unwords
 prepare :: String -> Phrase
 prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|") 
 
-rulesCompile :: [(String, [String])] -> BotBrain
-rulesCompile = map (\(pattern, responses) -> (prepare pattern, map prepare responses))
-  where
-    prepare = words . map toLower . filter (not . flip elem ".,:;*!#%&|")
-
-
---------------------------------------
+-- --------------------------------------
 
 
 reductions :: [PhrasePair]
@@ -104,9 +98,9 @@ reductionsApply :: [PhrasePair] -> Phrase -> Phrase
 reductionsApply = fix . try . transformationsApply "*" id
 
 
--------------------------------------------------------
--- Match and substitute
---------------------------------------------------------
+-- -------------------------------------------------------
+-- -- Match and substitute
+-- --------------------------------------------------------
 
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
@@ -137,23 +131,23 @@ match wildcard (p:ps) (s:ss)
 
 
 
--- Test cases --------------------
+-- -- Test cases --------------------
 
-testPattern =  "a=*;"
-testSubstitutions = "32"
-testString = "a=32;"
+-- testPattern =  "a=*;"
+-- testSubstitutions = "32"
+-- testString = "a=32;"
 
-substituteTest = substitute '*' testPattern testSubstitutions
-substituteCheck = substituteTest == testString
+-- substituteTest = substitute '*' testPattern testSubstitutions
+-- substituteCheck = substituteTest == testString
 
--- matchTest = match '*' testPattern testString
--- matchCheck = matchTest == Just testSubstitutions
+-- -- matchTest = match '*' testPattern testString
+-- -- matchCheck = matchTest == Just testSubstitutions
 
 
 
--------------------------------------------------------
--- Applying patterns
---------------------------------------------------------
+-- -------------------------------------------------------
+-- -- Applying patterns
+-- --------------------------------------------------------
 
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
