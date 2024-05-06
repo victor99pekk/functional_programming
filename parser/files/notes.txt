@@ -6,7 +6,7 @@ ex:
                     Otherwise it should return the [tree, String].
 
 
-Struction
+Structure
 - return a Maybe, that is Just (list) if correct, otherwise Nothing.
 - Build trees from the expression
 
@@ -20,5 +20,5 @@ Returns a pair, which is which is a parsed object and the rest of the string.
 return, returns a parser...
 
 
-difference on how to parse powers and addition and multiplication
+difference on how to parse powers from addition and multiplication
 
