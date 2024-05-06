@@ -1,7 +1,4 @@
--- Input: Two strings s and t, and values for scoreMatch, scoreMismatch, and scoreSpace.
--- Output: All optimal alignments between s and t.
-
--- optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
+-- Victor Pekkari, Brasse Wiklund
 
 scoreMatch :: Int
 scoreMismatch :: Int
@@ -50,8 +47,9 @@ maximaBy :: Ord b => (a -> b) -> [a] -> [a]
 maximaBy valueFcn xs = filter ((== maximumValue) . valueFcn) xs
   where
     maximumValue = maximum (map valueFcn xs)
-type AlignmentType = (String,String)
 
+
+type AlignmentType = (String,String)
 
 
 -- 2d)
