@@ -28,7 +28,7 @@ import Parser hiding (T)
 import qualified Dictionary
 
 data Expr = Num Integer | Var String | Add Expr Expr 
-       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr
+       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
          deriving Show
 
 type T = Expr
@@ -41,6 +41,8 @@ var = word >-> Var
 
 num = number >-> Num
 
+expOp = lit '^' >-> (\_ -> Exp)
+
 mulOp = lit '*' >-> (\_ -> Mul) !
         lit '/' >-> (\_ -> Div)
 
@@ -52,6 +54,7 @@ bldOp e (oper,e') = oper e e'
 factor = num !
          var !
          lit '(' -# expr #- lit ')' !
+         expOp # factor >-> bldOp e #> factor' ! return e !
          err "illegal factor"
              
 term' e = mulOp # factor >-> bldOp e #> term' ! return e
@@ -71,7 +74,22 @@ shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Num n) _ = error "value not implemented"
+value (Num n) _ = n
+value (Var v) dict = case Dictionary.lookup v dict of
+                        Just val -> val
+                        Nothing -> error "variable not found"
+value (Add a b) dict = value a dict + value b dict
+value (Sub a b) dict = value a dict - value b dict
+value (Mul a b) dict = value a dict * value b dict
+value (Exp e1 e2) dict = value e1 dict ^ value e2 dict
+value (Div a b) dict = let val2 = value b dict
+                        in if val2 == 0
+                        then error "div by 0!"
+                        else value a dict `div` val2
+
+
+
+
 
 instance Parse Expr where
     parse = expr
