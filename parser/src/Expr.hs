@@ -28,18 +28,20 @@ import Parser hiding (T)
 import qualified Dictionary
 
 data Expr = Num Integer | Var String | Add Expr Expr 
-       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
+       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
          deriving Show
 
 type T = Expr
 
-var, num, factor, term, expr :: Parser Expr
+var, num, factor, term, expr, expo :: Parser Expr
 
 term', expr' :: Expr -> Parser Expr
 
 var = word >-> Var
 
 num = number >-> Num
+
+expo = exponential >-> Exp
 
 expOp = lit '^' >-> (\_ -> Exp)
 
@@ -54,7 +56,7 @@ bldOp e (oper,e') = oper e e'
 factor = num !
          var !
          lit '(' -# expr #- lit ')' !
-         expOp # factor >-> bldOp e #> factor' ! return e !
+         expo !
          err "illegal factor"
              
 term' e = mulOp # factor >-> bldOp e #> term' ! return e

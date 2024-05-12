@@ -4,6 +4,7 @@ module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
 import Prelude hiding (return, fail)
 import Data.Char
 import CoreParser
+import Control.Monad (replicateM)
 infixl 7 -#, #- 
 
 type T a = Parser a
@@ -23,7 +24,7 @@ m -# n = m # n >-> snd
 m #- n = m # n >-> fst
 
 spaces :: Parser String
-spaces = (char ? isSpace)
+spaces = iter (char ? isSpace)
 
 token :: Parser a -> Parser a
 token m = m #- spaces
@@ -34,8 +35,22 @@ letter = (char ? isAlpha)
 word :: Parser String
 word = token (letter # iter letter >-> cons)
 
+appendString :: String -> String -> String
+appendString n s = n ++ s
+
+iterate' :: Parser a -> Int -> Parser [a]
+iterate' m 0 = return []
+iterate' m i = m # iterate' m (i-1) >-> cons
+
 chars :: Int -> Parser String
-chars n = replicateM n char
+chars n = iterate' (char) n 
+
+-- number’ :: Int -> Parser Int
+-- number’ n =
+--     digitVal >-> bldNumber n #> number’
+--     ! return n
+-- number :: Parser Int
+-- number = token (digitVal #> number’)
 
 accept :: String -> Parser String
 accept w = (token (chars (length w))) ? (==w)
@@ -57,4 +72,6 @@ number' n = digitVal #> (\ d -> number' (10*n+d))
           ! return n
 number :: Parser Integer
 number = token (digitVal #> number')
+
+
 
