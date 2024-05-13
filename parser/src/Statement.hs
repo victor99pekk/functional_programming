@@ -27,14 +27,17 @@ buildAss (v, e) = Assignment v e
 skip = accept "skip" #- require ";" >-> buildSkip
 buildSkip _ = Skip
 
-begin = accept "begin" -# iter parse #- require "end" >-> buildBegin
+begin = accept "begin" -# iter Expr.parse #- require "end" >-> buildBegin
 buildBegin stmts = Begin stmts
 
-ifStmt = accept "if" -# Expr.parse #- require "then" -# parse #- require "else" -# parse >-> buildIf
+ifStmt = accept "if" -# Expr.parse #- require "then" -# assignment #- require "else" -# assignment >-> buildIf
 buildIf ((cond, thenStmt), elseStmt) = If cond thenStmt elseStmt
+-- ifStmt = accept "if" -# Expr.parse #- require "then" -# parse #- require "else" -# parse >-> buildIf
 
-while = accept "while" -# Expr.parse #- require "do" -# parse >-> buildWhile
+whileStmt = accept "while" -# Expr.parse #- require "do" -# assignment >-> buildWhile
+-- ifStmt = accept "if" -# Expr.parse #- require "then" -# Statement.parse >-> buildWhile
 buildWhile (cond, stmt) = While cond stmt
+
 
 readStmt = accept "read" -# word #- require ";" >-> buildRead
 buildRead v = Read v
@@ -42,7 +45,7 @@ buildRead v = Read v
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
 buildWrite e = Write e
 
-comment = accept "--" -# iter (sat (/= '\n')) >-> buildComment
+comment = accept "--" -# iter (char ? (/= '\n')) >-> buildComment
 buildComment c = Comment c
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
@@ -52,13 +55,14 @@ exec (If cond thenStmts elseStmts: stmts) dict input =
     else exec (elseStmts: stmts) dict input
 
 instance Parse Statement where
-  parse = comment ! assignment ! skip ! begin ! ifStmt ! while ! readStmt ! write
+
+  parse = comment ! assignment ! skip ! begin ! ifStmt ! whileStmt ! readStmt ! write
   toString s = case s of
                 Assignment v e -> v ++ " := " ++ Expr.toString e ++ ";\n"
                 Skip -> "skip;\n"
                 Begin stmts -> "begin\n" ++ concatMap toString stmts ++ "end\n"
                 Write e -> "write " ++ Expr.toString e ++ ";\n"
                 Read e -> "read " ++ e ++ ";\n"
-                While cond thenStmt elseStmt -> "while " ++ Expr.toString cond ++ "do\n" ++ toString thenStmt ++ "else\n" ++ toString elseStmt
-                If cond stmt -> "if " ++ Expr.toString cond ++ " then \n" ++   
+                If cond thenStmt elseStmt -> "if " ++ Expr.toString cond ++ "do\n" ++ toString thenStmt ++ "else\n" ++ toString elseStmt ++ ";\n"
+                While cond stmt -> "while " ++ Expr.toString cond ++ " then \n" ++ toString stmt ++ ";\n"
                 Comment c -> "-- " ++ c ++ "\n"
