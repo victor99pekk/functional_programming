@@ -28,12 +28,12 @@ import Parser hiding (T)
 import qualified Dictionary
 
 data Expr = Num Integer | Var String | Add Expr Expr 
-       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
+       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr
          deriving Show
 
 type T = Expr
 
-var, num, factor, term, expr, expo :: Parser Expr
+var, num, factor, term, expr :: Parser Expr
 
 term', expr' :: Expr -> Parser Expr
 
@@ -41,9 +41,6 @@ var = word >-> Var
 
 num = number >-> Num
 
-expo = exponential >-> Exp
-
-expOp = lit '^' >-> (\_ -> Exp)
 
 mulOp = lit '*' >-> (\_ -> Mul) !
         lit '/' >-> (\_ -> Div)
@@ -56,7 +53,6 @@ bldOp e (oper,e') = oper e e'
 factor = num !
          var !
          lit '(' -# expr #- lit ')' !
-         expo !
          err "illegal factor"
              
 term' e = mulOp # factor >-> bldOp e #> term' ! return e
@@ -83,7 +79,6 @@ value (Var v) dict = case Dictionary.lookup v dict of
 value (Add a b) dict = value a dict + value b dict
 value (Sub a b) dict = value a dict - value b dict
 value (Mul a b) dict = value a dict * value b dict
-value (Exp e1 e2) dict = value e1 dict ^ value e2 dict
 value (Div a b) dict = let val2 = value b dict
                         in if val2 == 0
                         then error "div by 0!"

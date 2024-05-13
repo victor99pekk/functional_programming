@@ -35,7 +35,6 @@ buildIf ((cond, thenStmt), elseStmt) = If cond thenStmt elseStmt
 -- ifStmt = accept "if" -# Expr.parse #- require "then" -# parse #- require "else" -# parse >-> buildIf
 
 whileStmt = accept "while" -# Expr.parse #- require "do" -# assignment >-> buildWhile
--- ifStmt = accept "if" -# Expr.parse #- require "then" -# Statement.parse >-> buildWhile
 buildWhile (cond, stmt) = While cond stmt
 
 
@@ -47,6 +46,7 @@ buildWrite e = Write e
 
 comment = accept "--" -# iter (char ? (/= '\n')) >-> buildComment
 buildComment c = Comment c
+-- buildSkip _ = Skip
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec (If cond thenStmts elseStmts: stmts) dict input = 
