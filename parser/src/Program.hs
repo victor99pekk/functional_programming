@@ -8,6 +8,6 @@ newtype T = Program [Statement.T] -- Program represented as a list of Statements
 
 instance Parse T where
   parse = iter Statement.parse >-> Program
-  toString = error "Program.toString not implemented"
 
 exec (Program stmts) = Statement.exec stmts Dictionary.empty []
+
