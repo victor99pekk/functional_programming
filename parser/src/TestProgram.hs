@@ -79,6 +79,20 @@ s4 = "\
 \  end\
 \write a;"
 
+s5 = "\
+\read a;\
+\read b;\
+\s := 3;\
+\while a do\
+\  begin\
+\    c := a^s;\
+\    d := 2^a;\
+\    write c;\
+\    write d;\                    
+\    a := a-1;\
+\  end\
+\write a;"
+
 p4 = fromString s4
 
 rp4 = Program.exec p4 [4,4]

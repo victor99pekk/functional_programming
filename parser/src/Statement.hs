@@ -47,23 +47,38 @@ buildRead v = Read v
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
 buildWrite e = Write e
 
-comment = accept "--" -# iter (char ? (/= '\n')) >-> buildSkip
+comment = accept "-- " -# iter (char ? (/= '\n')) >-> buildComment
+buildComment s = Comment s
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec (If cond thenStmts elseStmts: stmts) dict input = 
     if (Expr.value cond dict)>0 
     then exec (thenStmts: stmts) dict input
     else exec (elseStmts: stmts) dict input
+exec (While cond stmt: stmts) dict input = 
+    if (Expr.value cond dict)>0 
+    then exec (stmt: While cond stmt: stmts) dict input
+    else exec stmts dict input
+exec (Assignment v e: stmts) dict input = exec stmts (Dictionary.insert (v, Expr.value e dict) dict) input
+exec (Skip: stmts) dict input = exec stmts dict input
+exec (Begin stmts': stmts) dict input = exec (stmts' ++ stmts) dict input
+exec (Read v: stmts) dict (i:input) = exec stmts (Dictionary.insert (v, i) dict) input
+exec (Write e: stmts) dict input = Expr.value e dict : exec stmts dict input
+exec (Comment _: stmts) dict input = exec stmts dict input
+exec [] _ _ = []
+
+
+indent :: String -> String
+indent str = unlines . map ("\t" ++) . lines $ str
 
 instance Parse Statement where
-
   parse = comment ! assignment ! skip ! begin ! ifStmt ! whileStmt ! readStmt ! write
   toString s = case s of
-                Assignment v e -> v ++ " := " ++ Expr.toString e ++ ";\n"
-                Skip -> "skip;\n"
-                Begin stmts -> "begin\n" ++ concatMap toString stmts ++ "end\n"
-                Write e -> "write " ++ Expr.toString e ++ ";\n"
-                Read e -> "read " ++ e ++ ";\n"
-                If cond thenStmt elseStmt -> "if " ++ Expr.toString cond ++ "do\n" ++ toString thenStmt ++ "else\n" ++ toString elseStmt ++ ";\n"
-                While cond stmt -> "while " ++ Expr.toString cond ++ " then \n" ++ toString stmt ++ ";\n"
-                Comment c -> "-- " ++ c ++ "\n"
+    Assignment v e -> v ++ " := " ++ Expr.toString e ++ ";\n"
+    Skip -> "skip;\n"
+    Begin stmts -> "begin\n" ++ indent (concatMap toString stmts) ++ "end"
+    Write e -> "write " ++ Expr.toString e ++ ";\n"
+    Read e -> "read " ++ e ++ ";\n"
+    If cond thenStmt elseStmt -> "if " ++ Expr.toString cond ++ " then\n" ++ indent (toString thenStmt) ++ "else\n" ++ indent (toString elseStmt) ++ ";\n"
+    While cond stmt -> "while " ++ Expr.toString cond ++ " do\n" ++ indent (toString stmt)
+    Comment c -> "-- " ++ c ++ "\n"

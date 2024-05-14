@@ -15,6 +15,10 @@ err message cs = error (message++" near "++cs++"\n")
 iter :: Parser a -> Parser [a]  
 iter m = m # iter m >-> cons ! return [] 
 
+-- row :: Parser [String]
+-- row = iter (token (word ! number))
+
+
 cons(a, b) = a:b
 
 (-#) :: Parser a -> Parser b -> Parser b
@@ -72,6 +76,7 @@ number' n = digitVal #> (\ d -> number' (10*n+d))
           ! return n
 number :: Parser Integer
 number = token (digitVal #> number')
+
 
 
 
