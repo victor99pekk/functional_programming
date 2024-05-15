@@ -1,3 +1,6 @@
+-- Victor Pekkari, Brasse Wiklund
+
+
 module Program(T, parse, fromString, toString, exec) where
 import Parser hiding (T)
 import qualified Statement
