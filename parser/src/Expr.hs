@@ -35,7 +35,7 @@ type T = Expr
 
 var, num, factor, term, expr :: Parser Expr
 
-term', expr' :: Expr -> Parser Expr
+term', expr', power' :: Expr -> Parser Expr
 
 var = word >-> Var
 

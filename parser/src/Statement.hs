@@ -21,34 +21,48 @@ data Statement =
     Comment String
     deriving Show
 
+assignment :: Parser Statement
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
+
+buildAss :: (String, Expr.T) -> Statement
 buildAss (v, e) = Assignment v e
 
+skip :: Parser Statement
 skip = accept "skip" #- require ";" >-> buildSkip
+
+buildSkip :: String -> Statement
 buildSkip _ = Skip
 
+begin :: Parser Statement
 begin = accept "begin" -# iter Expr.parse #- require "end" >-> buildBegin
+
+buildBegin :: [Statement] -> Statement
 buildBegin stmts = Begin stmts
 
--- ifStmt = accept "if" -# Expr.parse #- require "then" -# assignment #- require "else" -# assignment >-> buildIf
--- buildIf ((cond, thenStmt), elseStmt) = If cond thenStmt elseStmt
--- ifStmt = accept "if" -# Expr.parse #- require "then" -# parse #- require "else" -# parse >-> buildIf
-
+ifStmt :: Parser Statement
 ifStmt = accept "if" -# Expr.parse # require "then" -# parse # require "else" -# parse >-> buildIf
+
+buildIf :: ((Expr.T, Statement), Statement) -> Statement
 buildIf ((cond, thenStmt), elseStmt) = If cond thenStmt elseStmt
 
+whileStmt :: Parser Statement
 whileStmt = accept "while" -# Expr.parse # require "do" -# parse >-> buildWhile
+buildWhile :: (Expr.T, Statement) -> Statement
 buildWhile (cond, stmt) = While cond stmt
 
-
+readStmt :: Parser Statement
 readStmt = accept "read" -# word #- require ";" >-> buildRead
+buildRead :: String -> Statement
 buildRead v = Read v
 
+write :: Parser Statement
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
+buildWrite :: Expr.T -> Statement
 buildWrite e = Write e
 
+comment :: Parser Statement
 comment = accept "-- " -# iter (char ? (/= '\n')) #- require "\n" >-> buildComment
--- commentParser = accept "--" -# iter (char ? (/= '\n')) #- require "\n" 
+buildComment :: String -> Statement
 buildComment s = Comment s
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
@@ -73,13 +87,16 @@ indent :: String -> String
 indent str = unlines . map ("\t" ++) . lines $ str
 
 instance Parse Statement where
-  parse = comment ! assignment ! skip ! begin ! ifStmt ! whileStmt ! readStmt ! write
-  toString s = case s of
-    Assignment v e -> v ++ " := " ++ Expr.toString e ++ ";\n"
-    Skip -> "skip;\n"
-    Begin stmts -> "begin\n" ++ indent (concatMap toString stmts) ++ "end"
-    Write e -> "write " ++ Expr.toString e ++ ";\n"
-    Read e -> "read " ++ e ++ ";\n"
-    If cond thenStmt elseStmt -> "if " ++ Expr.toString cond ++ " then\n" ++ indent (toString thenStmt) ++ "else\n" ++ indent (toString elseStmt) ++ "\n"
-    While cond stmt -> "while " ++ Expr.toString cond ++ " do\n" ++ indent (toString stmt)
-    Comment c -> "-- " ++ c ++ "\n"
+    parse :: Parser Statement
+    parse = comment ! assignment ! skip ! begin ! ifStmt ! whileStmt ! readStmt ! write
+    
+    toString :: Statement -> String
+    toString s = case s of
+        Assignment v e -> v ++ " := " ++ Expr.toString e ++ ";\n"
+        Skip -> "skip;\n"
+        Begin stmts -> "begin\n" ++ indent (concatMap toString stmts) ++ "end"
+        Write e -> "write " ++ Expr.toString e ++ ";\n"
+        Read e -> "read " ++ e ++ ";\n"
+        If cond thenStmt elseStmt -> "if " ++ Expr.toString cond ++ " then\n" ++ indent (toString thenStmt) ++ "else\n" ++ indent (toString elseStmt) ++ "\n"
+        While cond stmt -> "while " ++ Expr.toString cond ++ " do\n" ++ indent (toString stmt)
+        Comment c -> "-- " ++ c ++ "\n"

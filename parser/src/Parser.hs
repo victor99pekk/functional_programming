@@ -18,7 +18,7 @@ iter m = m # iter m >-> cons ! return []
 commentParser :: Parser String
 commentParser = accept "--" -# iter (char ? (/= '\n')) #- require "\n" 
 
-
+cons :: (a, [a]) -> [a]
 cons(a, b) = a:b
 
 (-#) :: Parser a -> Parser b -> Parser b
@@ -48,13 +48,6 @@ iterate' m i = m # iterate' m (i-1) >-> cons
 
 chars :: Int -> Parser String
 chars n = iterate' (char) n 
-
--- number’ :: Int -> Parser Int
--- number’ n =
---     digitVal >-> bldNumber n #> number’
---     ! return n
--- number :: Parser Int
--- number = token (digitVal #> number’)
 
 accept :: String -> Parser String
 accept w = (token (chars (length w))) ? (==w)
