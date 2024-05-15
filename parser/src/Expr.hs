@@ -28,7 +28,7 @@ import Parser hiding (T)
 import qualified Dictionary
 
 data Expr = Num Integer | Var String | Add Expr Expr 
-       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
+       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Power Expr Expr
          deriving Show
 
 type T = Expr
@@ -41,7 +41,7 @@ var = word >-> Var
 
 num = number >-> Num
 
-expOp = lit '^' >-> (\_ -> Exp)
+powOp = lit '^' >-> (\_ -> Power)
 
 
 mulOp = lit '*' >-> (\_ -> Mul) !
@@ -56,10 +56,13 @@ factor = num !
          var !
          lit '(' -# expr #- lit ')' !
          err "illegal factor"
+
+power' e = powOp # power >-> bldOp e #> power' ! return e
+power = factor #> power'
              
-term' e = mulOp # factor >-> bldOp e #> term' ! return e
-term = factor #> term'
-       
+term' e = mulOp # power >-> bldOp e #> term' ! return e
+term = power #> term'
+
 expr' e = addOp # term >-> bldOp e #> expr' ! return e
 expr = term #> expr'
 
@@ -72,7 +75,7 @@ shw prec (Add t u) = parens (prec>5) (shw 5 t ++ "+" ++ shw 5 u)
 shw prec (Sub t u) = parens (prec>5) (shw 5 t ++ "-" ++ shw 6 u)
 shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
-shw prec (Exp t u) = parens (prec>7) (shw 7 t ++ "^" ++ shw 7 u)
+shw prec (Power t u) = parens (prec>7) (shw 7 t ++ "^" ++ shw 7 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) _ = n
@@ -86,7 +89,7 @@ value (Div a b) dict = let val2 = value b dict
                         in if val2 == 0
                         then error "div by 0!"
                         else value a dict `div` val2
-value (Exp a b) dict = value a dict ^ value b dict
+value (Power a b) dict = value a dict ^ value b dict
 
 
 

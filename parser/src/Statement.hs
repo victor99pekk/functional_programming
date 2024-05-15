@@ -47,7 +47,8 @@ buildRead v = Read v
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
 buildWrite e = Write e
 
-comment = accept "-- " -# iter (char ? (/= '\n')) >-> buildComment
+comment = accept "-- " -# iter (char ? (/= '\n')) #- require "\n" >-> buildComment
+-- commentParser = accept "--" -# iter (char ? (/= '\n')) #- require "\n" 
 buildComment s = Comment s
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
@@ -65,7 +66,7 @@ exec (Begin stmts': stmts) dict input = exec (stmts' ++ stmts) dict input
 exec (Read v: stmts) dict (i:input) = exec stmts (Dictionary.insert (v, i) dict) input
 exec (Write e: stmts) dict input = Expr.value e dict : exec stmts dict input
 exec (Comment _: stmts) dict input = exec stmts dict input
-exec [] _ _ = []
+exec _ _ _ = []
 
 
 indent :: String -> String
@@ -79,6 +80,6 @@ instance Parse Statement where
     Begin stmts -> "begin\n" ++ indent (concatMap toString stmts) ++ "end"
     Write e -> "write " ++ Expr.toString e ++ ";\n"
     Read e -> "read " ++ e ++ ";\n"
-    If cond thenStmt elseStmt -> "if " ++ Expr.toString cond ++ " then\n" ++ indent (toString thenStmt) ++ "else\n" ++ indent (toString elseStmt) ++ ";\n"
+    If cond thenStmt elseStmt -> "if " ++ Expr.toString cond ++ " then\n" ++ indent (toString thenStmt) ++ "else\n" ++ indent (toString elseStmt) ++ "\n"
     While cond stmt -> "while " ++ Expr.toString cond ++ " do\n" ++ indent (toString stmt)
     Comment c -> "-- " ++ c ++ "\n"

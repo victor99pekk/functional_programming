@@ -15,8 +15,8 @@ err message cs = error (message++" near "++cs++"\n")
 iter :: Parser a -> Parser [a]  
 iter m = m # iter m >-> cons ! return [] 
 
--- row :: Parser [String]
--- row = iter (token (word ! number))
+commentParser :: Parser String
+commentParser = accept "--" -# iter (char ? (/= '\n')) #- require "\n" 
 
 
 cons(a, b) = a:b

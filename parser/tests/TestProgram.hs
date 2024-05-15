@@ -93,6 +93,10 @@ s5 = "\
 \  end\
 \write a;"
 
+
+p5 = fromString s5
+rp5 = Program.exec p5 []
+
 p4 = fromString s4
 
 rp4 = Program.exec p4 [4,4]
