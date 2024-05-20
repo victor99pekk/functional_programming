@@ -389,3 +389,73 @@ The combination of copying and call-by-name evaluation is what is known as lazy-
 
 ## Strict Application ($!)
 - to avoid avoid lazy evaluation you can use the "$!" operator. it ensures that function arguments are fully evaulated when the function is applied.
+
+
+
+## Profiling
+- profiling enables you to evaluate the performance of a program using compiler flags
+prof: This flag enables profiling in the generated executable.
+fprof-auto: This flag automatically adds cost centers to all top-level functions for profiling.
+
+- CAF (Constant Applicative Form), is a term used in haskell to describe a top level chunk that is not a function, and does not have any parameters. It is a value or computation that defined at the top level of the program and can therefore be used througout the program. if the computation is intensive, caf can significantly increase the performance of the program since it is only computed once. If the caf takes up large amount of memory, it can significantly decrease the amount of memory used (since it doesn't get stored twice).
+
+Example:
+```haskell
+-- compilation
+-- rtsopts: Allows the program to accept runtime options (necessary for +RTS -p).
+ghc -prof -fprof-auto -rtsopts -o fib_prog fib.hs
+
+-- execution
+-- Run it with the +RTS -p option to generate a profiling report:
+-- +RTS: Indicates the start of runtime options.
+-- -p: Generates a profiling report file named fib_prog.prof.
+./fib_prog +RTS -p 
+```
+### intepret the report
+total time: Total execution time of the program.
+total alloc: Total memory allocation during execution.
+COST CENTRE: Shows the function names and their source locations.
+MODULE and SRC: Indicate the module and source file location of the function.
+%time: The percentage of total time spent in this function.
+%alloc: The percentage of total memory allocated by this function.
+
+### haskell execution context
+- `OS-Level Threads`: Managed by the operating system, these are heavyweight and can be fewer in number due to system limitations
+- `Haskell Threads`: Lightweight, managed by the GHC runtime, allowing for thousands of concurrent threads.
+Each HEC is responsible for running haskell threads. The GHC runtime creates a pool of HEC, the amount depending on how many cpu cores that are available. Haskell threads are scheduled on these HECs to achieve parallel execution
+- all HEC contain a `run queue` containing all haskell threads ready for execution.
+- Task is an OS-thread managing the execution of an HEC.
+- The HEC also participates in garbage collecting.
+
+### Summary of Profiling
+profiling is an essential practice for optimizing haskell programms. By compiling with the named flags you can find bottlenecks, and memory usage in your code.
+
+
+### Concurrency 
+this function can be imported, it takes an IO action and performs it in a new thread (within the runtime system).
+```haskell
+forkIO :: IO() -> IO ThreadId
+```
+
+(MVar a) is an atomic datawrapper. the operations on the MVar (like `takeMvar` and `putMVar`) are blocking.
+
+Example of protecting the output channel with mutex:
+```haskell
+takeMVar mutex      -- take lock, to protect resource
+putStrLn greeting   -- Perform action
+putMVar mutex ()    -- release lock
+```
+
+## Sparks
+- the RTS (run-time-system) handles the parallel computations with spark
+
+### Step 1
+- Spark is created with the function `par`. The spark is then place into a spark-pool of an HEC.
+- When a spark has already been evaluated it is not added to the spark pool. It is called a DUD in this case.
+- When too many sparks are added to a HEC queue, you get overflow. The spark will not be evaluated in parallel in this case. This can therefore be a bottleneck.
+
+### Step 2
+- `conversion`, best case an available core evaluates the spark.
+- If the computation in a spark is needed before it has been converted by a core, it is said to be fizzled. It is evaluated without the conversion
+- if a spark is never needed, it is garbage collected. This is only bad if we have too many sparks that get garbage collected, since it consumes computation power.
+
