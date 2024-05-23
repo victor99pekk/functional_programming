@@ -382,6 +382,52 @@ square (1+2)
     9
 ```
 
+### normal form
+- a program is in normal form iff it is fully evaluated
+Examples:
+```haskell
+1+1 -> 2
+(1, 2+2) -> (1, 4)
+[True && False] -> [False]
+```
+
+functions and lambda expressions can't be futher evaluated until they get their arguments are therefore already in normal form.
+Example:
+```haskell
+(\x -> x+1)     -- In normal form
+```
+
+### weak head noraml form (WHNF)
+- this definition only holds for data-values, not functions.
+An expression fully evaluated up to at least the first data constructor
+
+- normal form implies WHNF
+- Evaluation up until the outermost constructor is enough to imply WHNF
+
+Example:
+```haskell
+1+1 -> 2
+(1, 2+2) -> (1, 2+2)    -- The data constructor is the tuple
+[True && False] -> _ : _    -- the constructor with unevaluated terms
+-- data MyData a = A float | B Int
+A (3.14 - 2.71) -> A _
+```
+
+- can functions be written in WHNF?
+YES.
+```haskell
+f x = <expr>    -- this is not a value but a function
+f = \x -> <expr>    -- this is a value
+``` 
+
+### General rules for WHNF
+(for data-values:)
+1. A data constructor, but the arguments for the constructor don't need to be fully evaluated
+(for functions:)
+2. a built in function applied to too few arguments, since that can be reduced to a lambda expression. ((+)2)
+3. a lambda expression, this can't be evaluated further.
+
+
 - fourtunatly the call-be-name evaluation ineffiency problem can be easily solved. It is solved by using pointers that indicate sharing of expressions during the evaluation. That is, instead of physically copying the argument we have several pointers to the address where the value lies.
 
 ### lazy evaluation
@@ -431,7 +477,7 @@ Each HEC is responsible for running haskell threads. The GHC runtime creates a p
 profiling is an essential practice for optimizing haskell programms. By compiling with the named flags you can find bottlenecks, and memory usage in your code.
 
 
-### Concurrency 
+## Concurrency 
 this function can be imported, it takes an IO action and performs it in a new thread (within the runtime system).
 ```haskell
 forkIO :: IO() -> IO ThreadId
@@ -446,8 +492,12 @@ putStrLn greeting   -- Perform action
 putMVar mutex ()    -- release lock
 ```
 
-## Sparks
+
+## Sparks (lazy-future)
 - the RTS (run-time-system) handles the parallel computations with spark
+- if the RTS determines that there are enough resources (CPU-cores) and that the computation is sufficiently large, it will convert the spark into a parallel thread. 
+- if the system is too busy or the task is too small to benfit from parallel execution, the spark might not be converted into a parallel thread immediatly.
+
 
 ### Step 1
 - Spark is created with the function `par`. The spark is then place into a spark-pool of an HEC.
@@ -458,4 +508,44 @@ putMVar mutex ()    -- release lock
 - `conversion`, best case an available core evaluates the spark.
 - If the computation in a spark is needed before it has been converted by a core, it is said to be fizzled. It is evaluated without the conversion
 - if a spark is never needed, it is garbage collected. This is only bad if we have too many sparks that get garbage collected, since it consumes computation power.
+
+### par, pseq and seq
+- the functions `par` and `seq` have much in common. They have the same signatur and use the same patterns.
+- par lets you start a computation in parallel
+- seq forces a computation to take place, avoiding laze-evaluation
+- pseq evaluates the first arguent to WHNF before evaluating the second argument.
+```haskell
+par :: a -> b -> b
+pseq :: a -> b -> b
+seq :: a -> b -> b
+```
+
+`seq` evaluates to WHNF like this:
+```haskell
+seq a _ -> a will be evaluated to WHNF
+```
+
+### Example of Sparks using par, pseq and seq:
+this will create a spark but not a thread. that's because the expression 
+
+`f `par` (f + e)`
+
+will create a spark for f, suggesting that the computations can br run in parallel. However f will only be evaluated when it's value is needed in `f + e`.
+
+```haskell
+BadParallel :: Int -> Int -> Int
+BadParallel a b = f `par` (f + e)
+  where
+    f = fib a
+    e = sumEuler b
+
+GoodParallel :: Int -> Int -> Int
+GoodParallel a b = f `par` (e `pseq` (f + e))
+  where
+    f = fib a
+    e = sumEuler b
+```
+The difference in good- and bad-parallel is that while badParallel suggests that f can be computed in parallel, it is not really needed, since f is asked to be evaluated right after.
+
+In goodParallel `pseq` forces e to be evaluated before `f+e`, this is what allows f to be computed in parallel.
 
