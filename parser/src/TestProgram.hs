@@ -97,10 +97,19 @@ s5 = "\
 
 s6 = "\
 \read a;\
-\read -- input a value\
+\read -- input a value\n\
 \     -- into variable b:\n\
 \     b;\
 \s := 3;"
+
+s7 = "\
+\read a;\
+\read -- input a value\n\
+\     b;\
+\s := 3;"
+
+p7 = fromString s7
+rp7 = Program.exec p7 []
 
 p6 = fromString s6
 rp6 = Program.exec p6 []
