@@ -1,4 +1,5 @@
 -- Victor Pekkari, Brasse Wiklund
+{-# LANGUAGE InstanceSigs #-}
 
 
 module Dictionary (T, empty, lookup, insert) where

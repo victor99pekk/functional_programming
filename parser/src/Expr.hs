@@ -1,5 +1,6 @@
 -- Victor Pekkari, Brasse Wiklund
 
+{-# LANGUAGE InstanceSigs #-}
 
 module Expr(Expr, T, parse, fromString, value, toString) where
 

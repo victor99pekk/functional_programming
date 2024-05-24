@@ -1,4 +1,5 @@
 -- Victor Pekkari, Brasse Wiklund
+{-# LANGUAGE InstanceSigs #-}
 
 
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,

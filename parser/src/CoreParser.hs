@@ -1,4 +1,5 @@
 -- Victor Pekkari, Brasse Wiklund
+{-# LANGUAGE InstanceSigs #-}
 
 module CoreParser(Parser, char, return, fail, (#), (!), (?), (#>), (>->),
                   Parse, parse, toString, fromString) where

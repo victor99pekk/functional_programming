@@ -1,4 +1,5 @@
 -- Victor Pekkari, Brasse Wiklund
+{-# LANGUAGE InstanceSigs #-}
 
 
 module Program(T, parse, fromString, toString, exec) where

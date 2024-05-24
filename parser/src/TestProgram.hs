@@ -1,5 +1,6 @@
 {- Test for Program -}
 module TestProgram where
+{-# LANGUAGE InstanceSigs #-}
 
 import Program
 
