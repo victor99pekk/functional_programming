@@ -1,6 +1,7 @@
 {- Test for Program -}
-module TestProgram where
 {-# LANGUAGE InstanceSigs #-}
+module TestProgram where
+
 
 import Program
 
@@ -94,6 +95,15 @@ s5 = "\
 \  end\
 \write a;"
 
+s6 = "\
+\read a;\
+\read -- input a value\
+\     -- into variable b:\n\
+\     b;\
+\s := 3;"
+
+p6 = fromString s6
+rp6 = Program.exec p6 []
 
 p5 = fromString s5
 rp5 = Program.exec p5 []
