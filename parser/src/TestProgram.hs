@@ -100,7 +100,7 @@ s6 = "\
 \read -- input a value\n\
 \     -- into variable b:\n\
 \     b;\
-\s := 3;"
+\a := 3;"
 
 s7 = "\
 \read a;\

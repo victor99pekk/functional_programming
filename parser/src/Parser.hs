@@ -22,6 +22,15 @@ iter m = m # iter m >-> cons ! return []
 commentParser :: Parser String
 commentParser = accept "--" -# iter (char ? (/= '\n')) #- require "\n" 
 
+number' :: Integer -> Parser Integer
+number' n = digitVal #> (\ d -> number' (10*n+d))
+          ! return n
+number :: Parser Integer
+number = token (digitVal #> number')
+
+whitespaceOrComment :: Parser String
+whitespaceOrComment = iter ((spaces # commentParser)) -# spaces
+
 cons :: (a, [a]) -> [a]
 cons(a, b) = a:b
 
@@ -35,7 +44,8 @@ spaces :: Parser String
 spaces = iter (char ? isSpace)
 
 token :: Parser a -> Parser a
-token m = m #- spaces
+-- token m = m #- spaces
+token m = m #- whitespaceOrComment
 
 letter :: Parser Char
 letter = (char ? isAlpha)
@@ -68,11 +78,6 @@ digit = char ? isDigit
 digitVal :: Parser Integer
 digitVal = digit >-> digitToInt >-> fromIntegral
 
-number' :: Integer -> Parser Integer
-number' n = digitVal #> (\ d -> number' (10*n+d))
-          ! return n
-number :: Parser Integer
-number = token (digitVal #> number')
 
 
 
