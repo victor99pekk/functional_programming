@@ -100,7 +100,12 @@ s6 = "\
 \read -- input a value\n\
 \     -- into variable b:\n\
 \     b;\
-\a := 3;"
+\write a;\
+\write b;\
+\s := 3;"
+
+p6 = fromString s6
+rp6 = Program.exec p6 [1, 2]
 
 s7 = "\
 \read a;\
@@ -110,9 +115,6 @@ s7 = "\
 
 p7 = fromString s7
 rp7 = Program.exec p7 []
-
-p6 = fromString s6
-rp6 = Program.exec p6 []
 
 p5 = fromString s5
 rp5 = Program.exec p5 []
