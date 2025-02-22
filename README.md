@@ -79,6 +79,14 @@ __Key Concepts__
 - **Memoization**: A technique used to store and reuse previously computed values to avoid redundant calculations, significantly improving efficiency.
 - **Optimization**: The goal is to find the alignment(s) with the highest possible score, avoiding brute-force approaches that would be computationally expensive.
 
+
+__Scoring system: __ `scoreMatch` = 1, `scoreMismatch` = -1, `scoreSpace` = -2
+```plaintext
+H - A S K E L L
+- P A S C - A L
+```
+
+
 __Application in DNA Alignment__
 
 This technique is highly useful in **DNA sequence alignment**, where biological sequences (e.g., DNA, RNA, or proteins) are compared to find similarities, evolutionary relationships, or mutations. By aligning genetic sequences optimally, researchers can:
