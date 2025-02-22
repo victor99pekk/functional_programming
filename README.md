@@ -1,38 +1,37 @@
-# 3 - Projects in Haskell
+# Projects in Haskell
 
-[__(1) interpreter for a small imperative language__](#1-interpreter)
+This repository showcases a collection of Haskell projects that demonstrate advanced problem-solving techniques, including functional programming, optimization algorithms, and natural language processing.
 
-- implementing a parser and interpreter for an imperative language
+---
 
-[__(2) String Alignment Optimization - algorithm__](#2-string-alignment-optimization---algorithm)
+### [1. Interpreter for a Small Imperative Language](#1-interpreter)
 
-- Implemented a string alignment optimizer in Haskell using memoization to improve efficiency
+- Developed a custom parser and interpreter for a small imperative language.
+- Utilized Haskell’s powerful type system and monadic parsers to handle language parsing, execution, and error handling.
 
-[__(3) Chatbot__](#3-chatbot)
+### [2. String Alignment Optimization Algorithm](#2-string-alignment-optimization-algorithm)
 
-- recursive pattern matching chatbot
+- Implemented a string alignment optimizer using memoization to improve efficiency.
+- Applied dynamic programming techniques to solve optimization problems commonly encountered in computational biology.
 
-<br>
-<br>
+### [3. Chatbot (Inspired by Eliza)](#3-chatbot)
 
-# (1) Interpreter
+- Built a recursive pattern-matching chatbot inspired by the classic "Eliza" program.
+- Used Haskell's functional programming paradigm to implement flexible rule-based conversational patterns.
 
-The parsed statements are executed using an interpreter that evaluates expressions, assigns variables, and handles control flow structures.
+---
 
-The interpreter uses many monadic parsers, parsers in the lowest level try to parse specific strings, these parsers are then combined to parse certain statements. If a parser fails to parse, another parser can try. It is important that the parsers return monads since they will not always be able to parse.
+## 1. Interpreter for a Small Imperative Language
 
-The language has just one data type, integer, and variables are not declared. In the while and if statements a positive expression value is interpreted as true while 0 and negative values mean false.
+In this project, I implemented a parser and interpreter for a custom, simplified imperative language using **Haskell**. The interpreter evaluates arithmetic expressions, handles variable assignments, and supports basic control flow constructs like `if-then-else` and `while` loops.
 
-__Language features__
+### Key Features:
+- **Monadic Parsing**: Built using Haskell's monadic parsers to combine multiple parsing strategies for complex language structures. This approach allowed for better error recovery and modular code.
+- **Control Flow**: Supports `if-then-else` and `while` loops, with a custom interpretation of boolean expressions based on integer values (non-zero = true, zero = false).
+- **Variable Assignment**: Implements simple variable assignment without explicit declaration, mimicking dynamic typing.
+- **I/O Operations**: Provides basic input/output operations (`read`, `write`) to simulate interaction with the user.
 
-(1) `Variable assignments` (x := 10)
-(2) `Control Flow` (if-then-else, while loops)
-(3) `I/O-operations` (read, write)
-(4) `Èxpressions` with arithmetic (+,-,/,^,...)
-
-
-__Example code:__
-
+### Example Code:
 ```haskell
 -- Example of code
 read k;
@@ -43,18 +42,12 @@ read k;
        if m - m/k*k then
          skip;
        else
-         -- note a square below
          write m^2;
-       m := m + 1; -- an inline comment 
+       m := m + 1; -- Inline comment
      end
 ```
-<br>
 
-__Gramar:__
-
-
-This defines how you are allowed to build statements in the program, the collection of statements is the program.
-
+### Language Grammar
 ```haskell
    program ::= statements
    statement ::= variable ':=' expr ';'
@@ -68,57 +61,52 @@ This defines how you are allowed to build statements in the program, the collect
    variable ::= letter {letter}
 ```
 
+## 2. String Alignment Optimization Algorithm
+In this project, I implemented a string alignment optimization algorithm using Haskell’s functional programming techniques. The goal was to align two strings efficiently, taking into account different scoring systems for matches, mismatches, and gaps.
 
-# (2) String Alignment Optimization - algorithm
+### Key Concepts:
+- `Memoization`: Used to optimize the recursive solution by caching intermediate results, significantly improving the algorithm's performance.
+- `Dynamic Programming`: Implemented to handle the combinatorial explosion of possible string alignments, ensuring efficient calculation even with large input sizes.
+- `String Matching`: Utilized an alignment scoring system that rewards matches, penalizes mismatches, and introduces a gap penalty for space insertions.
 
-This project involves implementing a string alignment optimizer in Haskell using memoization to improve efficiency. The goal is to compute all optimal alignments between two strings based on a given scoring system that rewards matches and penalizes mismatches and spaces.
+### Scoring System:
 
-__Key Concepts__
+*   `scoreMatch = +1`
+*   `scoreMismatch = -1`
+*   `scoreSpace = -2`
 
-- **String Alignment**: The process of aligning two strings by inserting spaces to maximize similarity based on a scoring system.
-- **Memoization**: A technique used to store and reuse previously computed values to avoid redundant calculations, significantly improving efficiency.
-- **Optimization**: The goal is to find the alignment(s) with the highest possible score, avoiding brute-force approaches that would be computationally expensive.
-
-
-__Scoring system:__ `scoreMatch` = 1, `scoreMismatch` = -1, `scoreSpace` = -2
 ```plaintext
 H - A S K E L L
 - P A S C - A L
 ```
 
 
-__Application in DNA Alignment__
+## 3. Chatbot (Inspired by Eliza)
 
-This technique is highly useful in **DNA sequence alignment**, where biological sequences (e.g., DNA, RNA, or proteins) are compared to find similarities, evolutionary relationships, or mutations. By aligning genetic sequences optimally, researchers can:
+This project is a **recursive pattern-matching chatbot** inspired by the famous "Eliza" chatbot from the 1960s. The chatbot simulates a conversation by using predefined pattern-based rules, where user input is matched against a set of regular expressions.
 
-- Identify **unknown viruses** by comparing RNA sequences.
-- Detect **genetic variations** between species.
-- Construct **evolutionary trees** to understand the history of species divergence.
+### Key Features:
 
-Using Haskell's functional programming paradigm, the project efficiently handles the **combinatorial explosion** of possible alignments through dynamic programming and memoization, making it suitable for large-scale biological data analysis.
+- **Pattern Matching**: Utilized recursive pattern matching to process user input and generate appropriate responses.
+- **Rule-Based Responses**: Defined conversational rules with variable-length patterns, where the chatbot reflects part of the user's message.
+- **Natural Language Processing**: Simulated simple conversational AI with a list of predefined patterns that adjust responses based on user input.
 
-
-# (3) Chatbot
-Chatbot inspired by the early chatbot "Eliza" from the sixties. The chatbot uses pattern recursive pattern matching to reflect what you say, into responding questions. The chatbot is defined by a list of pattern based rules like this:
-
+### Example rule:
 ```haskell
 eliza = [
-  ("I need *",
-      ["Why do you need * ?",
-       "Would it really help you to get * ?",
-       "Are you sure you need * ?"]),
-
-  ("Why don't you *",
-      ["Do you really think I don't * ?",
-       "Perhaps eventually I will * .",
-       "Do you really want me to * ?"]),
-       
-       {-  ... and so on ... -} ]
+  ("I need *", ["Why do you need *?", "Would it really help you to get *?", "Are you sure you need *?"]),
+  ("Why don't you *", ["Do you really think I don't *?", "Perhaps eventually I will *.", "Do you really want me to *?"]),
+  {-  ... more patterns ... -}
+]
 ```
-- the '*' here is the rest of the sentence that isn't part of the match. This sentence is then reflected back instead of the '*'. It is also modified by for example switching instances of "I am" to "You are", since it would otherwise generate weird responses from the chatbot.
 
-<br>
+### chatbot Highlights:
 
+- Demonstrated understanding of **natural language processing** principles using functional programming.
+- Showcased the ability to build a conversational system with limited resources and predefined rules.
+- Explored recursive functions in Haskell for handling pattern matching and response generation.
+
+This chatbot demonstrates my capability to apply functional programming to build interactive, AI-driven systems.
 
 
 
