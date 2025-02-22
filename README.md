@@ -2,7 +2,9 @@
 
 ## Projects in Haskell:
 __(1) Chatbot__
+
 __(2) string-Alignment-Optimization-algorithm__
+
 __(3) interpreter for a small imperative language__
 <br>
 <br>
