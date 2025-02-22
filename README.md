@@ -1,6 +1,6 @@
 # 3 - Projects in Haskell
 
-__(1) interpreter for a small imperative language__
+[__(1) interpreter for a small imperative language__][# (1) `Interpreter`]
 
 - implementing a parser and interpreter for an imperative language
 
@@ -80,7 +80,7 @@ __Key Concepts__
 - **Optimization**: The goal is to find the alignment(s) with the highest possible score, avoiding brute-force approaches that would be computationally expensive.
 
 
-__Scoring system: __ `scoreMatch` = 1, `scoreMismatch` = -1, `scoreSpace` = -2
+__Scoring system:__ `scoreMatch` = 1, `scoreMismatch` = -1, `scoreSpace` = -2
 ```plaintext
 H - A S K E L L
 - P A S C - A L
