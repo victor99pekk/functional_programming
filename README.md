@@ -4,7 +4,7 @@
 
 - implementing a parser and interpreter for an imperative language
 
-[__(2) String alignment optimization algorithm__](#2-string-alignment-optimization-algorithm)
+[__(2) String Alignment Optimization - algorithm__](#2-string-alignment-optimization---algorithm)
 
 - Implemented a string alignment optimizer in Haskell using memoization to improve efficiency
 
@@ -69,7 +69,7 @@ This defines how you are allowed to build statements in the program, the collect
 ```
 
 
-# (2) `String Alignemnt optimization algorithm`
+# (2) String Alignemnt Optimization - algorithm
 
 This project involves implementing a string alignment optimizer in Haskell using memoization to improve efficiency. The goal is to compute all optimal alignments between two strings based on a given scoring system that rewards matches and penalizes mismatches and spaces.
 
@@ -98,7 +98,7 @@ This technique is highly useful in **DNA sequence alignment**, where biological 
 Using Haskell's functional programming paradigm, the project efficiently handles the **combinatorial explosion** of possible alignments through dynamic programming and memoization, making it suitable for large-scale biological data analysis.
 
 
-# (3) `Chatbot`
+# (3) Chatbot
 Chatbot inspired by the early chatbot "Eliza" from the sixties. The chatbot uses pattern recursive pattern matching to reflect what you say, into responding questions. The chatbot is defined by a list of pattern based rules like this:
 
 ```haskell
