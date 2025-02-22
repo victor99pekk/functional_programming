@@ -61,7 +61,7 @@ read k;
    variable ::= letter {letter}
 ```
 
-## 2. String Alignment Optimization Algorithm
+## 2 String Alignment Optimization Algorithm
 In this project, I implemented a string alignment optimization algorithm using Haskell’s functional programming techniques. The goal was to align two strings efficiently, taking into account different scoring systems for matches, mismatches, and gaps.
 
 ### Key Concepts:
