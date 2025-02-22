@@ -1,6 +1,6 @@
 # 3 - Projects in Haskell
 
-[__(1) interpreter for a small imperative language__](#`(1)-interpreter`)
+[__(1) interpreter for a small imperative language__](#(1)-interpreter)
 
 - implementing a parser and interpreter for an imperative language
 
@@ -15,7 +15,7 @@
 <br>
 <br>
 
-# (1) `Interpreter`
+# (1) Interpreter
 
 The parsed statements are executed using an interpreter that evaluates expressions, assigns variables, and handles control flow structures.
 
