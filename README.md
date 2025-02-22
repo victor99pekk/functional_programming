@@ -1,6 +1,6 @@
 # 3 - Projects in Haskell
 
-[__(1) interpreter for a small imperative language__]((#(1)-`interpreter`))
+[__(1) interpreter for a small imperative language__](#`(1)-interpreter`)
 
 - implementing a parser and interpreter for an imperative language
 
