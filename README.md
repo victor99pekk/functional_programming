@@ -69,7 +69,7 @@ This defines how you are allowed to build statements in the program, the collect
 ```
 
 
-# (2) String Alignemnt Optimization - algorithm
+# (2) String Alignemnt Optimization algorithm
 
 This project involves implementing a string alignment optimizer in Haskell using memoization to improve efficiency. The goal is to compute all optimal alignments between two strings based on a given scoring system that rewards matches and penalizes mismatches and spaces.
 
