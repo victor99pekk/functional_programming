@@ -21,7 +21,7 @@ This repository showcases a collection of Haskell projects that demonstrate adva
 
 ---
 
-## 1 Interpreter for an Imperative Language
+## 1. Interpreter for an Imperative Language
 
 In this project, I implemented a parser and interpreter for a custom, simplified imperative language using **Haskell**. The interpreter evaluates arithmetic expressions, handles variable assignments, and supports basic control flow constructs like `if-then-else` and `while` loops.
 
@@ -61,7 +61,7 @@ read k;
    variable ::= letter {letter}
 ```
 
-## 2 String Alignment Optimization Algorithm
+## 2. String Alignment Optimization Algorithm
 In this project, I implemented a string alignment optimization algorithm using Haskell’s functional programming techniques. The goal was to align two strings efficiently, taking into account different scoring systems for matches, mismatches, and gaps.
 
 ### Key Concepts:
