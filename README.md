@@ -4,7 +4,7 @@ This repository showcases a collection of Haskell projects that demonstrate adva
 
 ---
 
-### [1. Interpreter for a Small Imperative Language](#1.-interpreter)
+### [1. Interpreter for a Small Imperative Language](#1.-interpreter-for-an-imperative-language)
 
 - Developed a custom parser and interpreter for a small imperative language.
 - Utilized Haskell’s powerful type system and monadic parsers to handle language parsing, execution, and error handling.
@@ -21,7 +21,7 @@ This repository showcases a collection of Haskell projects that demonstrate adva
 
 ---
 
-## 1. Interpreter for a Small Imperative Language
+## 1. Interpreter for an Imperative Language
 
 In this project, I implemented a parser and interpreter for a custom, simplified imperative language using **Haskell**. The interpreter evaluates arithmetic expressions, handles variable assignments, and supports basic control flow constructs like `if-then-else` and `while` loops.
 
@@ -81,7 +81,7 @@ H - A S K E L L
 ```
 
 
-## 3. Chatbot (Inspired by Eliza)
+## 3. Chatbot
 
 This project is a **recursive pattern-matching chatbot** inspired by the famous "Eliza" chatbot from the 1960s. The chatbot simulates a conversation by using predefined pattern-based rules, where user input is matched against a set of regular expressions.
 
