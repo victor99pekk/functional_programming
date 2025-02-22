@@ -1,14 +1,14 @@
 # 3 - Projects in Haskell
 
-[__(1) interpreter for a small imperative language__](#(1)-interpreter)
+[__(1) interpreter for a small imperative language__](#1-interpreter)
 
 - implementing a parser and interpreter for an imperative language
 
-[__(2) String alignment optimization-algorithm__](#(2)-`String-Alignemnt-optimization-algorithm`)
+[__(2) String alignment optimization algorithm__](#2-string-alignment-optimization-algorithm)
 
 - Implemented a string alignment optimizer in Haskell using memoization to improve efficiency
 
-[__(3) Chatbot__](#(3)-`Chatbot`)
+[__(3) Chatbot__](#3-chatbot)
 
 - recursive pattern matching chatbot
 
