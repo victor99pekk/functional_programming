@@ -4,7 +4,7 @@ This repository showcases a collection of Haskell projects that demonstrate adva
 
 ---
 
-### [1. Interpreter for a Small Imperative Language](##1-interpreter-for-an-imperative-language)
+### [1. Interpreter for a Small Imperative Language](#1-interpreter-for-an-imperative-language)
 
 - Developed a custom parser and interpreter for a small imperative language.
 - Utilized Haskell’s powerful type system and monadic parsers to handle language parsing, execution, and error handling.
