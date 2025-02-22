@@ -1,19 +1,37 @@
-# functional_programming
+# 3 - Projects in Haskell
 
-## Projects in Haskell:
-__(1) Chatbot__
+__(1) interpreter for a small imperative language__
+
+- implementing a parser and interpreter for an imperative language
 
 __(2) string-Alignment-Optimization-algorithm__
 
-__(3) interpreter for a small imperative language__
+- Implemented a string alignment optimizer in Haskell using memoization to improve efficiency
+
+__(3) Chatbot__
+
+- recursive pattern matching chatbot
+
 <br>
 <br>
 
 # (1) Interpreter
 
+The parsed statements are executed using an interpreter that evaluates expressions, assigns variables, and handles control flow structures.
+
 The interpreter uses many monadic parsers, parsers in the lowest level try to parse specific strings, these parsers are then combined to parse certain statements. If a parser fails to parse, another parser can try. It is important that the parsers return monads since they will not always be able to parse.
 
 The language has just one data type, integer, and variables are not declared. In the while and if statements a positive expression value is interpreted as true while 0 and negative values mean false.
+
+__Language features__
+
+(1) `Variable assignments` (x := 10)
+(2) `Control Flow` (if-then-else, while loops)
+(3) `I/O-operations` (read, write)
+(4) `Èxpressions` with arithmetic (+,-,/,^,...)
+
+
+__Example code:__
 
 ```haskell
 -- Example of code
@@ -32,7 +50,11 @@ read k;
 ```
 <br>
 
-the grammar of the language is given by:
+__Gramar:__
+
+
+This defines how you are allowed to build statements in the program, the collection of statements is the program.
+
 ```haskell
    program ::= statements
    statement ::= variable ':=' expr ';'
@@ -45,7 +67,27 @@ the grammar of the language is given by:
    statements ::= {statement}
    variable ::= letter {letter}
 ```
-This defines how you are allowed to build statements in the program, the collection of statements is the program.
+
+
+# (2) String Alignemnt optimization algorithm
+
+This project involves implementing a string alignment optimizer in Haskell using memoization to improve efficiency. The goal is to compute all optimal alignments between two strings based on a given scoring system that rewards matches and penalizes mismatches and spaces.
+
+__Key Concepts__
+
+- **String Alignment**: The process of aligning two strings by inserting spaces to maximize similarity based on a scoring system.
+- **Memoization**: A technique used to store and reuse previously computed values to avoid redundant calculations, significantly improving efficiency.
+- **Optimization**: The goal is to find the alignment(s) with the highest possible score, avoiding brute-force approaches that would be computationally expensive.
+
+__Application in DNA Alignment__
+
+This technique is highly useful in **DNA sequence alignment**, where biological sequences (e.g., DNA, RNA, or proteins) are compared to find similarities, evolutionary relationships, or mutations. By aligning genetic sequences optimally, researchers can:
+
+- Identify **unknown viruses** by comparing RNA sequences.
+- Detect **genetic variations** between species.
+- Construct **evolutionary trees** to understand the history of species divergence.
+
+Using Haskell's functional programming paradigm, the project efficiently handles the **combinatorial explosion** of possible alignments through dynamic programming and memoization, making it suitable for large-scale biological data analysis.
 
 
 ## Chatbot
