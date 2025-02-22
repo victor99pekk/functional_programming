@@ -9,12 +9,12 @@ This repository showcases a collection of Haskell projects that demonstrate adva
 - Developed a custom parser and interpreter for a small imperative language.
 - Utilized Haskell’s powerful type system and monadic parsers to handle language parsing, execution, and error handling.
 
-### [2. String Alignment Optimization Algorithm](##2-string-alignment-optimization-algorithm)
+### [2. String Alignment Optimization Algorithm](#2-string-alignment-optimization-algorithm)
 
 - Implemented a string alignment optimizer using memoization to improve efficiency.
 - Applied dynamic programming techniques to solve optimization problems commonly encountered in computational biology.
 
-### [3. Chatbot](##3-chatbot)
+### [3. Chatbot](#3-chatbot)
 
 - Built a recursive pattern-matching chatbot inspired by the classic "Eliza" program.
 - Used Haskell's functional programming paradigm to implement flexible rule-based conversational patterns.
