@@ -1,33 +1,11 @@
 # functional_programming
 
 ### Projects in Haskell:
-- Chatbot
-- string-Alignment-Optimization-algorithm
-- interpreter for a small imperative language
+(1) Chatbot
+(2) string-Alignment-Optimization-algorithm
+(3) interpreter for a small imperative language
 
-
-## Chatbot
-Chatbot inspired by the early chatbot "Eliza" from the sixties. The chatbot uses pattern recursive pattern matching to reflect what you say, into responding questions. The chatbot is defined by a list of pattern based rules like this:
-
-```haskell
-eliza = [
-  ("I need *",
-      ["Why do you need * ?",
-       "Would it really help you to get * ?",
-       "Are you sure you need * ?"]),
-
-  ("Why don't you *",
-      ["Do you really think I don't * ?",
-       "Perhaps eventually I will * .",
-       "Do you really want me to * ?"]),
-       
-       {-  ... and so on ... -} ]
-```
-- the '*' here is the rest of the sentence that isn't part of the match. This sentence is then reflected back instead of the '*'. It is also modified by for example switching instances of "I am" to "You are", since it would otherwise generate weird responses from the chatbot.
-
-<br>
-
-## Interpreter
+# (1) Interpreter
 
 The interpreter uses many monadic parsers, parsers in the lowest level try to parse specific strings, these parsers are then combined to parse certain statements. If a parser fails to parse, another parser can try. It is important that the parsers return monads since they will not always be able to parse.
 
@@ -64,6 +42,28 @@ the grammar of the language is given by:
    variable ::= letter {letter}
 ```
 This defines how you are allowed to build statements in the program, the collection of statements is the program.
+
+
+## Chatbot
+Chatbot inspired by the early chatbot "Eliza" from the sixties. The chatbot uses pattern recursive pattern matching to reflect what you say, into responding questions. The chatbot is defined by a list of pattern based rules like this:
+
+```haskell
+eliza = [
+  ("I need *",
+      ["Why do you need * ?",
+       "Would it really help you to get * ?",
+       "Are you sure you need * ?"]),
+
+  ("Why don't you *",
+      ["Do you really think I don't * ?",
+       "Perhaps eventually I will * .",
+       "Do you really want me to * ?"]),
+       
+       {-  ... and so on ... -} ]
+```
+- the '*' here is the rest of the sentence that isn't part of the match. This sentence is then reflected back instead of the '*'. It is also modified by for example switching instances of "I am" to "You are", since it would otherwise generate weird responses from the chatbot.
+
+<br>
 
 
 
