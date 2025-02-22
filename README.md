@@ -4,7 +4,7 @@
 
 - implementing a parser and interpreter for an imperative language
 
-[__(2) String Alignment Optimization - algorithm__](#2-string-alignment-optimization---algorithm)
+[__(2) String Alignment Optimization - algorithm__](#2-string-alignment-optimization-algorithm)
 
 - Implemented a string alignment optimizer in Haskell using memoization to improve efficiency
 
