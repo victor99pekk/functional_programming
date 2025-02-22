@@ -4,11 +4,11 @@
 
 - implementing a parser and interpreter for an imperative language
 
-__(2) String alignment optimization-algorithm__
+[__(2) String alignment optimization-algorithm__](#(2)-`String-Alignemnt-optimization-algorithm`)
 
 - Implemented a string alignment optimizer in Haskell using memoization to improve efficiency
 
-__(3) Chatbot__
+[__(3) Chatbot__](#(3)-`Chatbot`)
 
 - recursive pattern matching chatbot
 
